@@ -56,7 +56,7 @@ public class Main {
         options.addOption(Option.builder("action").longOpt("action").argName("action").desc("an string array, you can input [deploy, e2e-test, test-local and clean]").hasArg().required(false).build());
         options.addOption(Option.builder("version").longOpt("version").argName("test-version").desc("mark workflow").hasArg().required(false).build());
         options.addOption(Option.builder("askConfig").longOpt("askConfig").argName("askConfig").desc("ASK cluster config").hasArg().required(false).build());
-        options.addOption(Option.builder("velauxUsername").longOpt("velauxUsername").argName("velaxUserName").desc("velaux username").hasArg().required(true).build());
+        options.addOption(Option.builder("velauxUsername").longOpt("velauxUsername").argName("velauxUserName").desc("velaux username").hasArg().required(true).build());
         options.addOption(Option.builder("velauxPassword").longOpt("velauxPassword").argName("velauxPassword").desc("velaux password").hasArg().required(true).build());
         options.addOption(Option.builder("chartGit").longOpt("chartGit").argName("chartGit").desc("helm chart resposity").hasArg().required(false).build());
         options.addOption(Option.builder("chartBranch").longOpt("chartBranch").argName("chartBranch").desc("helm chart resposity branch").hasArg().required(false).build());
