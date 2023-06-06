@@ -21,7 +21,6 @@ package org.apache.process.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Base64;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -30,8 +29,6 @@ import java.io.IOException;
 
 public class SetConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SetConfig.class);
-
-    static final Base64.Decoder DECODER = Base64.getDecoder();
 
 
     public void setConfig(String kubeConfig) throws IOException {
@@ -58,10 +55,8 @@ public class SetConfig {
         try {
             // 覆盖模式写
             FileWriter fileWriter = new FileWriter(kubeFilePath);
-            System.out.println("kubeConfig: "+kubeConfig.substring(0,10));
-            kubeConfig = new String(DECODER.decode(kubeConfig));
-            System.out.println("kubeConfig: "+kubeConfig.substring(0,10));
             fileWriter.write(kubeConfig);
+            System.out.println(kubeConfig.substring(0,12)+"   "+ kubeConfig.substring(kubeConfig.length()-12, kubeConfig.length()));
             fileWriter.close();
         } catch (IOException e) {
             LOGGER.error(String.format("write %s error!", kubeFilePath));
