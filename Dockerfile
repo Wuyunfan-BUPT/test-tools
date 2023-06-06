@@ -19,31 +19,9 @@ FROM maven:latest
 
 MAINTAINER wuyfee "wyf_mohen@163.com"
 
-ENV testRepo=${testRepo}
-ENV action=$2
-ENV version=$3
-ENV askConfig=$4
-ENV velauxUsername=$5
-ENV velauxPassword=$6
-ENV chartGit=$7
-ENV chartBranch=$8
-ENV chartPath=$9
-ENV testCodeGit=${10}
-ENV testCodeBranch=${11}
-ENV testCodePath=${12}
-ENV testCmdBase=${13}
-ENV jobIndex=${14}
-ENV helmValue=${15}
-
 EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
-RUN echo testRepo=${testRepo} \
-    && version=$3 \
-    && chartGit=$7 \
-    && echo ${testRepo} \
-    && echo ${version} \
-    && echo ${0}
 
 #RUN echo ${testRepo} \
 #    && echo ${version} \
@@ -57,6 +35,6 @@ RUN echo testRepo=${testRepo} \
 #    && echo ${helmValue}
 
 #ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${1}", "-action=${2n}", "-version=${3}", "-askConfig=${4}", "-velauxUsername=${5}", "-velauxPassword=${6}", "-chartGit=${7}", "-chartBranch=${8}", "-chartPath=${9}", "-testCodeGit=${10}", "-testCodeBranch=${11}", "-testCodePath=${12}", "-testCmdBase=${13}", "-jobIndex=${14}", "-helmValue=${15}"]
-#ENTRYPOINT ["/bin/sh", "-c","java -jar /rocketmq-test-tools.jar -testRepo=${1} -action=${2} -version=${3} -askConfig=${4} -velauxUsername=${5} -velauxPassword=${6} -chartGit=${7} -chartBranch=${8} -chartPath=${9} -testCodeGit=${10} -testCodeBranch=${11} -testCodePath=${12} -testCmdBase'mvn clean test -B' -jobIndex=${14} -helmValue=${15}"]
+ENTRYPOINT ["/bin/sh", "-c","java -jar /rocketmq-test-tools.jar -testRepo=${1} -action=${2} -version=${3} -askConfig=${4} -velauxUsername=${5} -velauxPassword=${6} -chartGit=${7} -chartBranch=${8} -chartPath=${9} -testCodeGit=${10} -testCodeBranch=${11} -testCodePath=${12} -jobIndex=${14} -helmValue=${15}"]
 #ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${testRepo} -action=${action} -version=${version} -askConfig=${askConfig} -velauxUsername=${velauxUsername} -velauxPassword=${velauxPassword} -chartGit=${chartGit} -chartBranch=${chartBranch} -chartPath=${chartPath} -testCodeGit=${testCodeGit} -testCodeBranch=${testCodeBranch} -testCodePath=${testCodePath} -testCmdBase=${testCmdBase} -jobIndex=${jobIndex} -helmValue=${helmValue}"]
-ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${testRepo}", "-action=${action}", "-version=${version}", "-askConfig=${askConfig}", "-velauxUsername=${velauxUsername}", "-velauxPassword=${velauxPassword}", "-chartGit=${chartGit}", "-chartBranch=${chartBranch}", "-chartPath=${chartPath}", "-testCodeGit=${testCodeGit}", "-testCodeBranch=${testCodeBranch}", "-testCodePath=${testCodePath}", "-testCmdBase=${testCmdBase}", "-jobIndex=${jobIndex}", "-helmValue=${helmValue}"]
+#ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${testRepo}", "-action=${action}", "-version=${version}", "-askConfig=${askConfig}", "-velauxUsername=${velauxUsername}", "-velauxPassword=${velauxPassword}", "-chartGit=${chartGit}", "-chartBranch=${chartBranch}", "-chartPath=${chartPath}", "-testCodeGit=${testCodeGit}", "-testCodeBranch=${testCodeBranch}", "-testCodePath=${testCodePath}", "-testCmdBase=${testCmdBase}", "-jobIndex=${jobIndex}", "-helmValue=${helmValue}"]
