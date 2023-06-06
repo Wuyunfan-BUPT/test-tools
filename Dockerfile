@@ -19,13 +19,13 @@ FROM maven:latest
 
 MAINTAINER wuyfee "wyf_mohen@163.com"
 EXPOSE  9082
-EXPOSE 80
 COPY src /src
 COPY pom.xml /pom.xml
 RUN mvn clean install \
     && ls /target \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
-    && rm -rf /pom.xml /src /target
+    && rm -rf /pom.xml /src /target \
+    && chmod 777 ./rocketmq-test-tools.jar
 
 ENTRYPOINT ["java", "-jar", "rocketmq-test-tools.jar"]
 
