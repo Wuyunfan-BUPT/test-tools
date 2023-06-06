@@ -38,13 +38,13 @@ public class SetConfig {
         System.out.println(usrHome);
 
         String kubeDirPath = String.format("%s/.kube", usrHome);
-        new ProcessBuilder().environment().put("KUBECONFIG", kubeFilePath);
         File kubeDir = new File(kubeDirPath);
         if (!kubeDir.exists() && !kubeDir.mkdirs()) {
             LOGGER.error(String.format("%s directory create fail！", kubeDirPath));
             System.out.printf("%s directory create fail！%n", kubeDirPath);
         }
         String kubeFilePath = String.format("%s/.kube/config", usrHome);
+        new ProcessBuilder().environment().put("KUBECONFIG", kubeFilePath);
         File kubeFile = new File(kubeFilePath);
         if (kubeDir.exists()) {
             kubeFile.delete();
