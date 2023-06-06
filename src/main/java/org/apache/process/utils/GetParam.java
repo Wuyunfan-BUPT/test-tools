@@ -28,6 +28,7 @@ public class GetParam {
     public HashMap<String, String> setParam(CommandLine cmd) {
         HashMap<String, String> result = new HashMap<>();
         for(Option option:cmd.getOptions()){
+            System.out.println(option.getLongOpt()+":"+option.getValue());
             result.put(option.getLongOpt(), option.getValue());
         }
         return result;
