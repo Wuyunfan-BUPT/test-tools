@@ -33,6 +33,8 @@ RUN mvn clean install \
     && export KUBECONFIG
 
 ENV KUBECONFIG=${KUBECONFIG}
+RUN echo ${KUBECONFIG}
+ENV KUBECONFIG=${KUBECONFIG}
 #ENTRYPOINT ["/bin/sh", "-c", "echo testRepo:$0 action:$1 version:$2 askConfig:$3 velauxUsername:$4 velauxPassword:$5 chartGit:$6 chartBranch:$7 chartPath:$8 testCodeGit:$9 testCodeBranch:${10} testCodePath:${11} testCmdBase:${12} jobIndex:${13} helmValue:${14} ${15} ${16} ${17} $*"]
 #ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${1}", "-action=${2n}", "-version=${3}", "-askConfig=${4}", "-velauxUsername=${5}", "-velauxPassword=${6}", "-chartGit=${7}", "-chartBranch=${8}", "-chartPath=${9}", "-testCodeGit=${10}", "-testCodeBranch=${11}", "-testCodePath=${12}", "-testCmdBase=${13}", "-jobIndex=${14}", "-helmValue=${15}"]
 ENTRYPOINT ["/bin/sh", "-c","java -jar /rocketmq-test-tools.jar -testRepo=\"${0}\" -action=\"${1}\" -version=\"${2}\" -askConfig=\"${3}\" -velauxUsername=\"${4}\" -velauxPassword=\"${5}\" -chartGit=\"${6}\" -chartBranch=\"${7}\" -chartPath=\"${8}\" -testCodeGit=\"${9}\" -testCodeBranch=\"${10}\" -testCodePath=\"${11}\" -testCmdBase=\"${12}\" -jobIndex=\"${13}\" -helmValue=\"${14}\""]
