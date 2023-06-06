@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class PortForward {
     public void startPortForward(String namespace, String podLabels, int localPort) throws InterruptedException {
         FabricPortForward fabricPortForward = new FabricPortForward();
-        new Thread(
+        Thread thread = new Thread(
                 new Runnable() {
                     @Override
                     public void run() {
@@ -36,7 +36,9 @@ public class PortForward {
                             ex.printStackTrace();
                         }
                     }
-                }).start();
-        Thread.sleep(8000);
+                });
+        thread.start();
+        thread.join(5000);
+        //Thread.sleep(8000);
     }
 }
