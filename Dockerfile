@@ -23,7 +23,7 @@ EXPOSE  9082
 EXPOSE  80
 COPY src /src
 COPY pom.xml /pom.xml
-ENV KUBECONFIG=${HOME}/.kube/config
+ENV KUBECONFIG=/root/.kube/config
 
 RUN mvn clean install \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
