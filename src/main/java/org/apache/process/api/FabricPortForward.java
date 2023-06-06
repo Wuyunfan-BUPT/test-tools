@@ -71,6 +71,7 @@ public class FabricPortForward {
                 System.out.printf("Using namespace: %s %n", namespace);
                 System.out.printf("Using podLabels: %s %n", podLabels);
                 PodList pode = client.pods().inNamespace(namespace).list();
+                System.out.println(pode);
                 for(Pod p:pode.getItems()){
                     String labels = p.getMetadata().getLabels().get("app.oam.dev/name");
                     System.out.printf("labels: %s %n", labels);
