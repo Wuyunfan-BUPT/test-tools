@@ -45,7 +45,7 @@ public class SetConfig {
             System.out.printf("%s directory create fail！%n", kubeDirPath);
         }
         String kubeFilePath = String.format("%s/.kube/config", usrHome);
-        System.setProperty("KUBECONFIG", kubeFilePath)
+        System.setProperty("KUBECONFIG", kubeFilePath);
         File kubeFile = new File(kubeFilePath);
         if (kubeDir.exists()) {
             kubeFile.delete();
