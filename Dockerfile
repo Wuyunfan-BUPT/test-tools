@@ -23,11 +23,11 @@ EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
 
-RUN mvn clean install \
-    && ls /target \
-    && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
-    && rm -rf /pom.xml /src /target \
-    && chmod 777 /rocketmq-test-tools.jar
+#RUN mvn clean install \
+#    && ls /target \
+#    && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
+#    && rm -rf /pom.xml /src /target \
+#    && chmod 777 /rocketmq-test-tools.jar
 
 ENTRYPOINT ["/bin/sh", "-c", "echo $@"]
 #ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${1}", "-action=${2n}", "-version=${3}", "-askConfig=${4}", "-velauxUsername=${5}", "-velauxPassword=${6}", "-chartGit=${7}", "-chartBranch=${8}", "-chartPath=${9}", "-testCodeGit=${10}", "-testCodeBranch=${11}", "-testCodePath=${12}", "-testCmdBase=${13}", "-jobIndex=${14}", "-helmValue=${15}"]
