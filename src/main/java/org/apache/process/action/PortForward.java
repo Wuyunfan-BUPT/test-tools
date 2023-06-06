@@ -37,6 +37,6 @@ public class PortForward {
                         }
                     }
                 }).start();
-        TimeUnit.SECONDS.sleep(8);
+        Thread.sleep(8000);
     }
 }
