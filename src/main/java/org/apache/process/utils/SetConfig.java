@@ -38,6 +38,7 @@ public class SetConfig {
         System.out.println(usrHome);
 
         String kubeDirPath = String.format("%s/.kube", usrHome);
+        new ProcessBuilder().environment().put("KUBECONFIG", kubeFilePath);
         File kubeDir = new File(kubeDirPath);
         if (!kubeDir.exists() && !kubeDir.mkdirs()) {
             LOGGER.error(String.format("%s directory create fail！", kubeDirPath));
@@ -58,7 +59,6 @@ public class SetConfig {
             fileWriter.write(kubeConfig);
             System.out.println(kubeConfig.substring(0,12)+"   "+ kubeConfig.substring(kubeConfig.length()-12, kubeConfig.length()));
             fileWriter.close();
-            new ProcessBuilder().environment().put("KUBECONFIG", kubeFilePath);
         } catch (IOException e) {
             LOGGER.error(String.format("write %s error!", kubeFilePath));
             System.out.printf("write %s error!%n", kubeFilePath);

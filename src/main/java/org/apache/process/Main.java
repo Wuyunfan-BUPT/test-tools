@@ -93,7 +93,7 @@ public class Main {
         //String velaAppDescription = repoName+"-"+GITHUB_WORKFLOW + "-"+GITHUB_RUN_ID+ "@" + paramsMap.get("version");
         String velaAppDescription = repoName+"-"+System.getenv("GITHUB_WORKFLOW") + "-"+System.getenv("GITHUB_RUN_ID") + "@"+paramsMap.get("version");
 
-        System.out.println("KUBECONFIG: "+System.getenv("KUBECONFIG"));
+
         paramsMap.put("repoName", repoName);
         paramsMap.put("env", env);
         paramsMap.put("velaAppDescription", velaAppDescription);
@@ -102,6 +102,7 @@ public class Main {
             Configs.VELAUX_USERNAME = paramsMap.get("velauxUsername");
             Configs.VELAUX_PASSWORD = paramsMap.get("velauxPassword");
             SetConfig setConfig = new SetConfig();
+            System.out.println("KUBECONFIG: "+System.getenv("KUBECONFIG"));
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
             if(repoTest!=null) {
                 new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
