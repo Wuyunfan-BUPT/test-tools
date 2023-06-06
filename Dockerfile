@@ -25,7 +25,7 @@ RUN mvn clean install \
     && ls /target \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
     && rm -rf /pom.xml /src /target \
-    && chmod 777 ./rocketmq-test-tools.jar
+    && chmod 777 /rocketmq-test-tools.jar
 
-ENTRYPOINT ["java", "-jar", "rocketmq-test-tools.jar"]
+ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar"]
 
