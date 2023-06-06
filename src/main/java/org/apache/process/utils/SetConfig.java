@@ -36,6 +36,7 @@ public class SetConfig {
         LOGGER.info("Set config... ");
         ;
         String usrHome = System.getProperty("user.home");
+        System.out.println(usrHome);
 
         String kubeDirPath = String.format("%s/.kube", usrHome);
         File kubeDir = new File(kubeDirPath);
