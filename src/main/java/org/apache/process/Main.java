@@ -98,9 +98,12 @@ public class Main {
         try{
             Configs.VELAUX_USERNAME = paramsMap.get("velauxUsername");
             Configs.VELAUX_PASSWORD = paramsMap.get("velauxPassword");
+            System.out.println("set config..");
             SetConfig setConfig = new SetConfig();
             setConfig.setConfig(paramsMap.get("askConfig"));
+            System.out.println("port forward...");
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
+            System.out.println("start deploy-->test-->clean...");
             if(repoTest!=null) {
                 new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
                 if(!repoTest.deploy()){

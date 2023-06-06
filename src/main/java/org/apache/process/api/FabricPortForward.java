@@ -68,7 +68,7 @@ public class FabricPortForward {
         public void podPortForward(String namespace, String podLabels, int localPort){
 
             try (KubernetesClient client = new KubernetesClientBuilder().build()) {
-                //System.out.printf("Using namespace: %s %n", namespace);
+                System.out.printf("Using namespace: %s %n", namespace);
                 PodList pode = client.pods().inNamespace(namespace).list();
                 for(Pod p:pode.getItems()){
                     String labels = p.getMetadata().getLabels().get("app.oam.dev/name");
