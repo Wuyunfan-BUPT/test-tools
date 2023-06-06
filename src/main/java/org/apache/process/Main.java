@@ -93,6 +93,7 @@ public class Main {
         //String velaAppDescription = repoName+"-"+GITHUB_WORKFLOW + "-"+GITHUB_RUN_ID+ "@" + paramsMap.get("version");
         String velaAppDescription = repoName+"-"+System.getenv("GITHUB_WORKFLOW") + "-"+System.getenv("GITHUB_RUN_ID") + "@"+paramsMap.get("version");
 
+        System.out.println(System.getenv("KUBECONFIG"));
         paramsMap.put("repoName", repoName);
         paramsMap.put("env", env);
         paramsMap.put("velaAppDescription", velaAppDescription);
