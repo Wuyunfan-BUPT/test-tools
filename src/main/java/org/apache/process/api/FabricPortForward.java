@@ -93,7 +93,7 @@ public class FabricPortForward {
                                         }
                                            }
                                 }).start();
-
+                        TimeUnit.SECONDS.sleep(5);
 
                         System.out.println("Checking forwarded port......");
                         final ResponseBody responseBody = new OkHttpClient()
