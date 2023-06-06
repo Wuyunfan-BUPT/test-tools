@@ -26,18 +26,17 @@ import java.util.concurrent.TimeUnit;
 public class PortForward {
     public void startPortForward(String namespace, String podLabels, int localPort) throws InterruptedException {
         FabricPortForward fabricPortForward = new FabricPortForward();
-        fabricPortForward.podPortForward(namespace, podLabels, localPort);
-//        new Thread(
-//                new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        try {
-//                            fabricPortForward.podPortForward(namespace, podLabels, localPort);
-//                        } catch (Exception ex) {
-//                            ex.printStackTrace();
-//                        }
-//                    }
-//                }).start();
-        TimeUnit.SECONDS.sleep(5);
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            fabricPortForward.podPortForward(namespace, podLabels, localPort);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }).start();
+        TimeUnit.SECONDS.sleep(8);
     }
 }

@@ -80,20 +80,8 @@ public class FabricPortForward {
                         client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).waitUntilReady(10, TimeUnit.SECONDS);
 
                         InetAddress inetAddress = InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 });
-                        LocalPortForward portForward = null;
-                        new Thread(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            portForward = client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).portForward(containerPort,
+                        LocalPortForward portForward = portForward = client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).portForward(containerPort,
                                                     inetAddress, localPort);
-                                        } catch (Exception ex) {
-                                            ex.printStackTrace();
-                                        }
-                                           }
-                                }).start();
-                        TimeUnit.SECONDS.sleep(5);
 
                         System.out.println("Checking forwarded port......");
                         final ResponseBody responseBody = new OkHttpClient()
