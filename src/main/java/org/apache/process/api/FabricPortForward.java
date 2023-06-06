@@ -69,10 +69,13 @@ public class FabricPortForward {
 
             try (KubernetesClient client = new KubernetesClientBuilder().build()) {
                 System.out.printf("Using namespace: %s %n", namespace);
+                System.out.printf("Using podLabels: %s %n", podLabels);
                 PodList pode = client.pods().inNamespace(namespace).list();
                 for(Pod p:pode.getItems()){
                     String labels = p.getMetadata().getLabels().get("app.oam.dev/name");
+                    System.out.printf("labels: %s %n", labels);
                     if (podLabels.equals(labels)) {
+                        System.out.printf("find labels");
                         int containerPort = p.getSpec().getContainers().get(0).getPorts().get(0).getContainerPort();
                         client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).waitUntilReady(10, TimeUnit.SECONDS);
 
