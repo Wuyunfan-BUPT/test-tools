@@ -38,6 +38,12 @@ ENV helmValue=${15}
 EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
+RUN testRepo=${testRepo} \
+    && version=$3 \
+    && chartGit=$7 \
+    && echo ${testRepo} \
+    && echo ${version} \
+
 RUN echo ${testRepo} \
     && echo ${version} \
     && mvn clean install \
