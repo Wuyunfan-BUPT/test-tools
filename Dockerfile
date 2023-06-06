@@ -20,6 +20,7 @@ FROM maven:latest
 MAINTAINER wuyfee "wyf_mohen@163.com"
 
 EXPOSE  9082
+EXPOSE  80
 COPY src /src
 COPY pom.xml /pom.xml
 
