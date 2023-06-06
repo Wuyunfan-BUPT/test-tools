@@ -103,6 +103,7 @@ public class Main {
             setConfig.setConfig(paramsMap.get("askConfig"));
             System.out.println("port forward...");
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
+            TimeUnit.SECONDS.sleep(3);
             System.out.println("start deploy-->test-->clean...");
             if(repoTest!=null) {
                 new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
