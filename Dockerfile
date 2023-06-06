@@ -19,7 +19,7 @@ FROM maven:latest
 
 MAINTAINER wuyfee "wyf_mohen@163.com"
 
-ENV testRepo=$1
+ENV testRepo=${testRepo}
 ENV action=$2
 ENV version=$3
 ENV askConfig=$4
@@ -38,7 +38,9 @@ ENV helmValue=${15}
 EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
-RUN mvn clean install \
+RUN echo ${testRepo} \
+    && echo ${version} \
+    && mvn clean install \
     && ls /target \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
     && rm -rf /pom.xml /src /target \
