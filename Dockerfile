@@ -28,7 +28,7 @@ ENV KUBECONFIG=""
 RUN mvn clean install \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
     && rm -rf /pom.xml /src /target \
-    && export KUBECONFIG=${HOME}/.kube/config \
+    && export KUBECONFIG=`echo ${HOME}/.kube/config` \
     && echo ${KUBECONFIG}
 
 #ENTRYPOINT ["/bin/sh", "-c", "echo testRepo:$0 action:$1 version:$2 askConfig:$3 velauxUsername:$4 velauxPassword:$5 chartGit:$6 chartBranch:$7 chartPath:$8 testCodeGit:$9 testCodeBranch:${10} testCodePath:${11} testCmdBase:${12} jobIndex:${13} helmValue:${14} ${15} ${16} ${17} $*"]
