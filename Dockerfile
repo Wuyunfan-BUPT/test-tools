@@ -27,5 +27,5 @@ RUN mvn clean install \
     && rm -rf /pom.xml /src /target \
     && chmod 777 /rocketmq-test-tools.jar
 
-ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar"]
+ENTRYPOINT ["java", "-jar", "/rocketmq-test-tools.jar", "-testRepo=${testRepo} -action=${action} -version=${version} -askConfig=${askConfig} -velauxUsername=${velauxUsername} -velauxPassword=${velauxPassword} -chartGit=${chartGit} -chartBranch=${chartBranch} -chartPath=${chartPath} -testCodeGit=${testCodeGit} -testCodeBranch=${testCodeBranch} -testCodePath=${testCodePath} -testCmdBase=${testCmdBase} -jobIndex=${jobIndex} -helmValue=${helmValue}"]
 
