@@ -22,12 +22,14 @@ MAINTAINER wuyfee "wyf_mohen@163.com"
 EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
-#ENV KUBECONFIG=/root/.kube/config
+ARG KUBECONFIG_ARG=""
+# ENV KUBECONFIG=/root/.kube/config
+ENV KUBECONFIG=${KUBECONFIG_ARG}
 
 RUN mvn clean install \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
     && rm -rf /pom.xml /src /target \
-    && export KUBECONFIG=${HOME}/.kube/config \
+    && KUBECONFIG_ARG=${HOME}/.kube/config \
     && echo ${KUBECONFIG}
 
 #ENTRYPOINT ["/bin/sh", "-c", "echo testRepo:$0 action:$1 version:$2 askConfig:$3 velauxUsername:$4 velauxPassword:$5 chartGit:$6 chartBranch:$7 chartPath:$8 testCodeGit:$9 testCodeBranch:${10} testCodePath:${11} testCmdBase:${12} jobIndex:${13} helmValue:${14} ${15} ${16} ${17} $*"]
