@@ -38,7 +38,7 @@ public class PortForward {
                     }
                 });
         thread.start();
-        thread.join(5000);
+        thread.join(10000);
         //Thread.sleep(8000);
     }
 }
