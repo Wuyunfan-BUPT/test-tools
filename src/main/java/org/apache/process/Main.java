@@ -99,15 +99,17 @@ public class Main {
                     System.out.println("Deploy error!");
                     System.exit(1);
                 }
-                repoTest.testRepo();
+                boolean isSuccess = repoTest.testRepo();
                 repoTest.clean();
+                if(!isSuccess) {
+                    System.exit(1);
+                }
             }else{
                 System.out.printf("Not support %s! %n", paramsMap.get("testRepo"));
                 System.exit(1);
             }
         }catch(Exception e){
             e.printStackTrace();
-            System.exit(1);
         }
     }
 }
