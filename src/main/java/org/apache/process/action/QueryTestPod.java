@@ -99,6 +99,7 @@ public class QueryTestPod {
                             Copy copy = new Copy();
                             System.out.println("Copy test runlog");
                             copy.copyFileFromPod(namespace, testPodName, testPodName,"/root/testlog.tar.gz", Paths.get("testlog.tar.gz"));
+                            copy.copyFileFromPod(namespace, testPodName, testPodName,"/root/testlog.txt", Paths.get("testlog.txt"));
                             copy.copyDirectoryFromPod(namespace, testPodName, testPodName, "/root/testlog.tar.gz", path, true);
                             System.out.println("Copy test reports");
                             copy.copyDirectoryFromPod(namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), path, true);
