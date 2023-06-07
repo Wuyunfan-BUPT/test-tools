@@ -29,10 +29,6 @@ import org.apache.process.utils.SetConfig;
 
 import java.util.*;
 
-
-/**
- * Hello world!
- */
 public class Main {
     public static void main(String[] args){
         /* define input parameters */

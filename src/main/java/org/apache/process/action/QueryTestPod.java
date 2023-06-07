@@ -53,7 +53,7 @@ public class QueryTestPod {
                 podStatus = "Pending";
             }
             if (isWaitingTest) {
-                System.out.printf("echo waiting for %s test done...%n", testPodName);
+                System.out.printf("waiting for %s test done...%n", testPodName);
             } else {
                 System.out.printf("current pod status is %s, waitting pod stop...%n", podStatus);
             }
