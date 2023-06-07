@@ -100,15 +100,14 @@ public class Main {
                     System.exit(1);
                 }
                 repoTest.testRepo();
-
                 repoTest.clean();
-                System.exit(0);
             }else{
                 System.out.printf("Not support %s! %n", paramsMap.get("testRepo"));
+                System.exit(1);
             }
         }catch(Exception e){
             e.printStackTrace();
+            System.exit(1);
         }
-        System.exit(1);
     }
 }
