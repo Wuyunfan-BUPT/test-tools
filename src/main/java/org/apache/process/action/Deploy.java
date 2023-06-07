@@ -19,7 +19,6 @@
 
 package org.apache.process.action;
 
-import io.kubernetes.client.openapi.ApiException;
 import okhttp3.Response;
 import org.apache.process.api.AppActions;
 import org.apache.process.api.AuthAction;
@@ -28,7 +27,6 @@ import org.apache.process.model.Deploymodel;
 import org.apache.process.utils.PrintInfo;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 

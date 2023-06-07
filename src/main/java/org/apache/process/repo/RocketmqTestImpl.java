@@ -23,7 +23,6 @@ import io.kubernetes.client.custom.Quantity;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
-import io.kubernetes.client.util.exception.CopyNotSupportedException;
 import org.apache.process.action.Deploy;
 import org.apache.process.action.ProjectClean;
 import org.apache.process.action.QueryTestPod;

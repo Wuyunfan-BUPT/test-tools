@@ -26,7 +26,6 @@ import org.apache.process.api.AuthAction;
 import org.apache.process.api.EnvActions;
 import org.apache.process.utils.PrintInfo;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class ProjectClean {
