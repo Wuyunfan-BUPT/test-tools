@@ -90,8 +90,8 @@ public class nacosTestImpl implements RepoTest {
         String testCmdBase = contextMap.getOrDefault("testCmdBase", "mvn clean test -B");
         String nacosPort = "8848";
 
-        ApiClient client = Config.defaultClient();
-        Configuration.setDefaultApiClient(client);
+//        ApiClient client = Config.defaultClient();
+//        Configuration.setDefaultApiClient(client);
 
         CoreV1Api api = new CoreV1Api();
 

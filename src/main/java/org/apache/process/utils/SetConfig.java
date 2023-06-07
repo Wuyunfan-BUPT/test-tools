@@ -19,6 +19,9 @@
 
 package org.apache.process.utils;
 
+import io.kubernetes.client.openapi.ApiClient;
+import io.kubernetes.client.openapi.Configuration;
+import io.kubernetes.client.util.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +33,11 @@ import java.io.IOException;
 public class SetConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(SetConfig.class);
 
-    public void setConfig(String kubeConfig) throws IOException {
+    public String setConfig(String kubeConfig) throws IOException {
 
         LOGGER.info("Set config... ");
-        ;
         String usrHome = System.getProperty("user.home");
         System.out.println(usrHome);
-
         String kubeDirPath = String.format("%s/.kube", usrHome);
         File kubeDir = new File(kubeDirPath);
         if (!kubeDir.exists() && !kubeDir.mkdirs()) {
@@ -44,7 +45,8 @@ public class SetConfig {
             System.out.printf("%s directory create fail！%n", kubeDirPath);
         }
         String kubeFilePath = String.format("%s/.kube/config", usrHome);
-        new ProcessBuilder().environment().put("KUBECONFIG", kubeFilePath);
+        //Configs.KUBECONFIG_PATH = kubeFilePath;
+        //setKubeClientConfig(kubeFilePath);
         File kubeFile = new File(kubeFilePath);
         if (kubeDir.exists()) {
             kubeFile.delete();
@@ -63,6 +65,10 @@ public class SetConfig {
             LOGGER.error(String.format("write %s error!", kubeFilePath));
             System.out.printf("write %s error!%n", kubeFilePath);
         }
-
+        return kubeFilePath;
+    }
+    public void setKubeClientConfig(String kubeConfigPath) throws IOException {
+        ApiClient client = Config.fromConfig(kubeConfigPath);
+        Configuration.setDefaultApiClient(client);
     }
 }

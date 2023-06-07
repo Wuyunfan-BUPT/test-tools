@@ -65,9 +65,9 @@ public class FabricPortForward {
             System.out.println("end");
             System.exit(0);
         }
-        public void podPortForward(String namespace, String podLabels, int localPort){
+        public void podPortForward(String namespace, String podLabels, int localPort, String config){
 
-            try (KubernetesClient client = new KubernetesClientBuilder().build()) {
+            try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
                 System.out.printf("Using namespace: %s %n", namespace);
                 System.out.printf("Using podLabels: %s %n", podLabels);
                 PodList pode = client.pods().inNamespace(namespace).list();

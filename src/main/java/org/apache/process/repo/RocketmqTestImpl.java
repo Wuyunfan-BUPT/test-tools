@@ -81,8 +81,8 @@ public class RocketmqTestImpl implements RepoTest {
         String testCodePath = contextMap.getOrDefault("testCodePath", "java/e2e");
         String testCmdBase = contextMap.getOrDefault("testCmdBase","mvn -B test");
 
-        ApiClient client = Config.defaultClient();
-        Configuration.setDefaultApiClient(client);
+//        ApiClient client = Config.defaultClient();
+//        Configuration.setDefaultApiClient(client);
 
         CoreV1Api api = new CoreV1Api();
 

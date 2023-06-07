@@ -88,9 +88,7 @@ public class Main {
 //        String GITHUB_WORKFLOW = "PUSH-CI";
 //        String GITHUB_RUN_ID = "5118080574";//System.getenv("GITHUB_RUN_ID");
         String repoName = paramsMap.get("testRepo");
-        //String env = repoName + "-" + GITHUB_RUN_ID + "-" + paramsMap.getOrDefault("jobIndex", "0");  //repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+jobIndex;
         String env = repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+ paramsMap.getOrDefault("jobIndex", "0"); ;
-        //String velaAppDescription = repoName+"-"+GITHUB_WORKFLOW + "-"+GITHUB_RUN_ID+ "@" + paramsMap.get("version");
         String velaAppDescription = repoName+"-"+System.getenv("GITHUB_WORKFLOW") + "-"+System.getenv("GITHUB_RUN_ID") + "@"+paramsMap.get("version");
 
 
@@ -102,10 +100,12 @@ public class Main {
             Configs.VELAUX_USERNAME = paramsMap.get("velauxUsername");
             Configs.VELAUX_PASSWORD = paramsMap.get("velauxPassword");
             SetConfig setConfig = new SetConfig();
+            String kubeConfigPath = setConfig.setConfig(paramsMap.get("askConfig"));
+            setConfig.setKubeClientConfig(kubeConfigPath);
             System.out.println("KUBECONFIG: "+System.getenv("KUBECONFIG"));
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
             if(repoTest!=null) {
-                new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
+                new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, paramsMap.get("askConfig"));
                 if(!repoTest.deploy()){
                     System.out.println("Deploy error!");
                     System.exit(1);

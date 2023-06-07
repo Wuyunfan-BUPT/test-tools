@@ -40,8 +40,8 @@ public class QueryTestPod {
     public boolean getPodResult(String testPodName, String namespace, String testCmd, String testCodePath) throws IOException, InterruptedException, ApiException {
         System.out.println("********************query status and get result********************");
         TimeUnit.SECONDS.sleep(3);
-        ApiClient client = Config.defaultClient();
-        Configuration.setDefaultApiClient(client);
+//        ApiClient client = Config.defaultClient();
+//        Configuration.setDefaultApiClient(client);
         CoreV1Api api = new CoreV1Api();
         String podStatus = api.readNamespacedPod(testPodName, namespace, null).getStatus().getPhase();
         if (podStatus == null) {

@@ -49,6 +49,9 @@ public class Configs {
     // velaux password
     public static String VELAUX_PASSWORD = "";
 
+    // kube config path
+    public static String KUBECONFIG_PATH = "";
+
     // kubevela api version
     public static final String KUBEVELA_API = "api/v1";
 

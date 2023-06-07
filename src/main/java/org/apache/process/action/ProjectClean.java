@@ -24,9 +24,11 @@ import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.util.Config;
+import io.kubernetes.client.util.KubeConfig;
 import org.apache.process.api.AppActions;
 import org.apache.process.api.AuthAction;
 import org.apache.process.api.EnvActions;
+import org.apache.process.config.Configs;
 import org.apache.process.utils.PrintInfo;
 
 import java.io.IOException;
@@ -38,8 +40,10 @@ public class ProjectClean {
         System.out.println("************************************");
         System.out.println("*       Delete app and env...      *");
         System.out.println("************************************");
-        ApiClient client = Config.defaultClient();
-        Configuration.setDefaultApiClient(client);
+
+//        ApiClient client = Config.fromConfig(Configs.KUBECONFIG_PATH);
+//        //ApiClient client = Config.defaultClient();
+//        Configuration.setDefaultApiClient(client);
 
         CoreV1Api api = new CoreV1Api();
 
