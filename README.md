@@ -1,5 +1,8 @@
 # test-tools
 This project is used for repository testing, including deployment, testing, cleaning and other processes, currently supports rocketmq and nacos.
+## Preparation
+- ASK cluster: a cluster to run code
+- install kubevela in cluster
 
 ## Usage
 |     params     | required |             mean              |     values      |                                                                                default                                                                                 |
@@ -38,6 +41,48 @@ docker build -t test-tools
 docker run -it test-tools -testRepo=nacos -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} 
 # or
 docker run -it test-tools -testRepo=nacos -version=123456 -jobIndex=1 -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} -chartGit=https://ghproxy.com/https://github.com/Wuyunfan-BUPT/nacos-docker.git -chartPath=./helm chartBranch=master helmValue=${your helmValue} -testCodeGit=https://github.com/nacos-group/nacos-e2e.git -testCodePath=java/nacos-2X -testCmdBase="mvn clean test -B" 
+```
+### deploy in github action
+Attention: if you use this resposity dockerfile, make sure all params input and are in order. Example follow：
+```agsl
+test:
+    name: Deploy nacos-server
+    runs-on: ubuntu-latest
+      - uses: Wuyunfan-BUPT/test-tools@main
+        name: Deploy and run nacos test
+        with:
+          testRepo: "nacos"
+          action: ""
+          version: my-version
+          askConfig: "your asc config"
+          velauxUsername: "your velaux username"
+          velauxPassword: "your velaux password"
+          chartGit: "https://ghproxy.com/https://github.com/Wuyunfan-BUPT/nacos-docker.git"
+          chartBranch: "master"
+          chartPath: "./helm"
+          testCodeGit: "https://github.com/nacos-group/nacos-e2e.git"
+          testCodeBranch: "master"
+          testCodePath: "java/nacos-2X"
+          testCmdBase: 'mvn clean test -B'
+          jobIndex: ${{ strategy.job-index }}
+          helmValue: |
+            global:
+              mode: cluster
+            nacos:
+              replicaCount: 3
+              image: 
+                repository: wuyfeedocker/nacos-ci
+                tag: develop-88ccc682-10b0-4948-811a-8eba750e14ea-8
+              storage:
+                type: mysql
+                db:
+                  port: 3306
+                  username: nacos
+                  password: nacos
+                  param: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false
+            service:
+              nodePort: 30000
+              type: ClusterIP
 ```
 #### helmvalues example
 ##### rocketmq helm values example
