@@ -44,7 +44,45 @@ docker run -it test-tools -testRepo=nacos -version=123456 -jobIndex=1 -askConfig
 ```
 ### deploy in github action
 Attention: if you use this resposity dockerfile, make sure all params input and are in order. Example follow：
-```agsl
+#### rocketmq example
+```
+deploy:
+    name: Deploy RocketMQ
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Wuyunfan-BUPT/test-tools@main
+        name: Deploy, run e2etest and clean rocketmq
+        with:
+          testRepo: "rocketmq"
+          action: "deploy"
+          version: "your-version"
+          askConfig: "your ask config"
+          velauxUsername: "your velaux username"
+          velauxPassword: "your velaux password"
+          chartGit: "https://ghproxy.com/https://github.com/apache/rocketmq-docker.git"
+          chartBranch: "master"
+          chartPath: "./rocketmq-k8s-helm"
+          testCodeGit: "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git"
+          testCodeBranch: "master"
+          testCodePath: "java/e2e"
+          testCmdBase: "mvn -B test"
+          jobIndex: your job index
+          helmValue: |
+            nameserver:
+              image:
+                repository: wuyfeedocker/rocketm-ci
+                tag: develop-82ca7301-3b14-4f86-aaa8-4881ebe4762d-ubuntu
+            broker:
+              image:
+                repository: wuyfeedocker/rocketm-ci
+                tag: develop-82ca7301-3b14-4f86-aaa8-4881ebe4762d-ubuntu
+            proxy:
+              image:
+                repository: wuyfeedocker/rocketm-ci
+                tag: develop-82ca7301-3b14-4f86-aaa8-4881ebe4762d-ubuntu
+```
+#### nacos example
+```
 test:
     name: Deploy nacos-server
     runs-on: ubuntu-latest
@@ -53,7 +91,7 @@ test:
         with:
           testRepo: "nacos"
           action: ""
-          version: my-version
+          version: your-version
           askConfig: "your asc config"
           velauxUsername: "your velaux username"
           velauxPassword: "your velaux password"
@@ -64,7 +102,7 @@ test:
           testCodeBranch: "master"
           testCodePath: "java/nacos-2X"
           testCmdBase: 'mvn clean test -B'
-          jobIndex: ${{ strategy.job-index }}
+          jobIndex: your index
           helmValue: |
             global:
               mode: cluster
@@ -84,45 +122,3 @@ test:
               nodePort: 30000
               type: ClusterIP
 ```
-#### helmvalues example
-##### rocketmq helm values example
-```agsl
-nameserver:
-  image:
-    repository: apache/rocketmq-ci
-    tag: develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu
-broker:
-  image:
-    repository: apache/rocketmq-ci
-    tag: develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu
-proxy:
-  image:
-    repository: apache/rocketmq-ci
-    tag: develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu
-```
-##### nacos helm values example
-```agsl
-global:
-  mode: cluster
-nacos:
-  replicaCount: 3
-  image:
-    repository: wuyfeedocker/nacos-ci
-    tag: develop-4f26def4-ccb0-45e5-9989-874e78424bea-8
-  storage:
-    type: mysql
-    db:
-      port: 3306
-      username: nacos
-      password: nacos
-      param: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false
-service:
-  nodePort: 30009
-  type: ClusterIP
-```
-
-
-
-
-
-
