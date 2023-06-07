@@ -169,7 +169,7 @@ public class nacosTestImpl implements RepoTest {
             serverList.append(serverIP).append(",");
         }
         System.out.println(serverList.substring(0, serverList.length() - 1));
-        //v1EnvVar5.setValue(serverList.substring(0, serverList.length() - 1));
+        v1EnvVar5.setValue(serverList.substring(0, serverList.length() - 1));
         container.addEnvItem(v1EnvVar5);
         // add container to spec
         pod_template_spec.addContainersItem(container);
