@@ -104,12 +104,14 @@ public class Main {
                 if(!isSuccess) {
                     System.exit(1);
                 }
+                System.out.println(0);
             }else{
                 System.out.printf("Not support %s! %n", paramsMap.get("testRepo"));
                 System.exit(1);
             }
         }catch(Exception e){
             e.printStackTrace();
+            System.out.println(1);
         }
         System.out.println(0);
     }
