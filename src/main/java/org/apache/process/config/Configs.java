@@ -19,19 +19,6 @@
 
 package org.apache.process.config;
 
-// import org.slf4j.logger;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
-
-/**
- * get params
- * @author wenxuan
- * @date 2023/4/25
- */
 public class Configs {
 
     // velaux bearer token
@@ -48,9 +35,6 @@ public class Configs {
 
     // velaux password
     public static String VELAUX_PASSWORD = "";
-
-    // kube config path
-    public static String KUBECONFIG_PATH = "";
 
     // kubevela api version
     public static final String KUBEVELA_API = "api/v1";

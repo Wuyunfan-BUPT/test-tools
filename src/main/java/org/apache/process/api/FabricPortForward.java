@@ -29,54 +29,19 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import org.apache.process.config.Configs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 public class FabricPortForward {
-        private static final Logger logger = LoggerFactory.getLogger(FabricPortForward.class);
-        public static void main(String[] args) throws InterruptedException {
-            String namespace = "vela-system";
-            String podLabels = "addon-velaux";
-            int localPort = 9082;
-
-            new Thread(
-                    new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                System.out.println();
-                                //podPortForward(namespace, podLabels, localPort);
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }).start();
-            int count = 5;
-            while(count>0){
-                count--;
-                TimeUnit.SECONDS.sleep(5);
-                System.out.println("port forward......");
-            }
-            System.out.println("end");
-            System.exit(0);
-        }
         public void podPortForward(String namespace, String podLabels, int localPort, String config){
 
             try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
-                System.out.printf("Using namespace: %s %n", namespace);
-                System.out.printf("Using podLabels: %s %n", podLabels);
                 PodList pode = client.pods().inNamespace(namespace).list();
-                System.out.println(pode);
                 for(Pod p:pode.getItems()){
                     String labels = p.getMetadata().getLabels().get("app.oam.dev/name");
-                    System.out.printf("labels: %s %n", labels);
                     if (podLabels.equals(labels)) {
-                        System.out.printf("find labels");
                         int containerPort = p.getSpec().getContainers().get(0).getPorts().get(0).getContainerPort();
                         client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).waitUntilReady(10, TimeUnit.SECONDS);
 
@@ -85,7 +50,7 @@ public class FabricPortForward {
                                                     inetAddress, localPort);
 
                         System.out.println("Checking forwarded port......");
-                        final ResponseBody responseBody = new OkHttpClient()
+                       new OkHttpClient()
                                 .newCall(new Request.Builder().get().url("http://127.0.0.1:" + portForward.getLocalPort()).build()).execute()
                                 .body();
                         TimeUnit.MINUTES.sleep(Configs.MAX_RUN_TIME);
@@ -93,8 +58,6 @@ public class FabricPortForward {
                         portForward.close();
                     }
                 }
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {

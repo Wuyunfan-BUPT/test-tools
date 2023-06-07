@@ -20,12 +20,9 @@
 package org.apache.process.repo;
 
 import io.kubernetes.client.custom.Quantity;
-import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
-import io.kubernetes.client.util.Config;
 import org.apache.process.action.Deploy;
 import org.apache.process.action.ProjectClean;
 import org.apache.process.action.QueryTestPod;
@@ -40,7 +37,7 @@ import java.util.Random;
 public class nacosTestImpl implements RepoTest {
     public static HashMap<String, String> contextMap;
 
-    public nacosTestImpl(HashMap<String, String> map) throws InterruptedException {
+    public nacosTestImpl(HashMap<String, String> map) {
         contextMap = map;
       }
 
@@ -76,7 +73,7 @@ public class nacosTestImpl implements RepoTest {
 
         helmValue = "namespace: "+env+"\n"+ helmValue;
         Deploy deploy = new Deploy();
-        return deploy.runDeployTestTools(appName,alias,description,
+        return deploy.startDeploy(appName,alias,description,
                 repoName,chartPath,chartBranch,chartGit,
                 Configs.PROJECT_NAME,env,helmValue);
     }

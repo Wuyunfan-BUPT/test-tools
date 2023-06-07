@@ -20,12 +20,9 @@
 package org.apache.process.repo;
 
 import io.kubernetes.client.custom.Quantity;
-import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.*;
-import io.kubernetes.client.util.Config;
 import io.kubernetes.client.util.exception.CopyNotSupportedException;
 import org.apache.process.action.Deploy;
 import org.apache.process.action.ProjectClean;
@@ -68,12 +65,12 @@ public class RocketmqTestImpl implements RepoTest {
                 "    tag: develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\n");
 
         Deploy deploy = new Deploy();
-        return deploy.runDeployTestTools(appName,alias,description,
+        return deploy.startDeploy(appName,alias,description,
                 repoName,chartPath,chartBranch,chartGit,
                 Configs.PROJECT_NAME,env, helmValue);
     }
     @Override
-    public boolean testRepo() throws IOException, ApiException, InterruptedException, CopyNotSupportedException {
+    public boolean testRepo() throws IOException, ApiException, InterruptedException {
         System.out.println("**************E2E TEST...***************");
         String namespace = contextMap.get("env");
         String testCodeGit = contextMap.getOrDefault("testCodeGit", "https://github.com/apache/rocketmq-e2e.git");

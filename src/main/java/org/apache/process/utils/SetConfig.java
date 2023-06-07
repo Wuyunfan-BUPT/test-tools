@@ -59,7 +59,6 @@ public class SetConfig {
             // 覆盖模式写
             FileWriter fileWriter = new FileWriter(kubeFilePath);
             fileWriter.write(kubeConfig);
-            System.out.println(kubeConfig.substring(0,12)+"   "+ kubeConfig.substring(kubeConfig.length()-12, kubeConfig.length()));
             fileWriter.close();
         } catch (IOException e) {
             LOGGER.error(String.format("write %s error!", kubeFilePath));

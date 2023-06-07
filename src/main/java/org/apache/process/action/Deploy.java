@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Deploy {
-    public boolean runDeployTestTools(String appName, String alias, String description, String repoName, String chartPath, String chartBranch, String chartGit, String projectName, String env,String helmValues) throws IOException, InterruptedException, ApiException {
+    public boolean startDeploy(String appName, String alias, String description, String repoName, String chartPath, String chartBranch, String chartGit, String projectName, String env, String helmValues) throws  InterruptedException {
         System.out.println("************************************");
         System.out.println("*     Create env and deploy...     *");
         System.out.println("************************************");
@@ -58,7 +58,6 @@ public class Deploy {
         try{
             authAction.setToken("refresh_token");
             String componentProperty = Deploymodel.generateComponentProperties(helmValues, chartPath, chartBranch, chartGit);
-            //String componentProperty = String.format(Deploymodel.COMPONENT_PROPERTY1, chartPath, chartBranch, chartGit); //env,
             String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, appName, projectName, description, alias, env, repoName, componentProperty);
             Response createAppResponse = appActions.createApplication(bodyContent);
             PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", appName)));
@@ -67,7 +66,7 @@ public class Deploy {
             System.exit(1);
         }
 
-        System.out.println(String.format("deploy %s Application", appName));
+        System.out.printf("deploy %s Application%n", appName);
         try{
             String workflowName = "workflow-"+appName;
             String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
@@ -86,7 +85,7 @@ public class Deploy {
                 while(querryTime>0) {
                     authAction.setToken("refresh_token");
                     Response response = appActions.getApplicationStatus(appName, env);
-                    JSONObject json = null;
+                    JSONObject json;
                     if (response.body() != null) {
                         json = new JSONObject(response.body().string());
                         response.close();

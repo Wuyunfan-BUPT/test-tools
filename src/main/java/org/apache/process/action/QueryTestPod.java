@@ -21,11 +21,8 @@ package org.apache.process.action;
 
 import io.kubernetes.client.Copy;
 import io.kubernetes.client.Exec;
-import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.util.Config;
 
 import java.io.BufferedReader;
 import java.io.IOException;

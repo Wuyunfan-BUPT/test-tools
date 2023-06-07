@@ -21,20 +21,15 @@ package org.apache.process.action;
 
 import org.apache.process.api.FabricPortForward;
 
-import java.util.concurrent.TimeUnit;
-
 public class PortForward {
     public void startPortForward(String namespace, String podLabels, int localPort, String config) throws InterruptedException {
         FabricPortForward fabricPortForward = new FabricPortForward();
         Thread thread = new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            fabricPortForward.podPortForward(namespace, podLabels, localPort, config);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
+                () -> {
+                    try {
+                        fabricPortForward.podPortForward(namespace, podLabels, localPort, config);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 });
         thread.start();

@@ -20,7 +20,6 @@
 package org.apache.process;
 
 import io.kubernetes.client.openapi.ApiException;
-//import io.kubernetes.client.util.Yaml;
 import io.kubernetes.client.util.exception.CopyNotSupportedException;
 
 import org.apache.process.action.PortForward;
@@ -35,23 +34,16 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
-
 
 import java.io.*;
 import java.util.*;
-//import java.util.Base64;
 
 
 /**
  * Hello world!
  */
 public class Main {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    //static final Base64.Decoder DECODER = Base64.getDecoder();
-
-
-    public static void main(String[] args) throws IOException, InterruptedException, ApiException, CopyNotSupportedException, GitAPIException, MavenInvocationException, ParseException {
+    public static void main(String[] args){
         /* define input parameters */
         Options options = new Options();
         options.addOption(Option.builder("testRepo").longOpt("testRepo").argName("testRepo").desc("test repo, currently support [nacos, rocketmq]").hasArg().required(true).build());
@@ -85,10 +77,8 @@ public class Main {
             System.exit(1);
         }
 
-//        String GITHUB_WORKFLOW = "PUSH-CI";
-//        String GITHUB_RUN_ID = "5118080574";//System.getenv("GITHUB_RUN_ID");
         String repoName = paramsMap.get("testRepo");
-        String env = repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+ paramsMap.getOrDefault("jobIndex", "0"); ;
+        String env = repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+ paramsMap.getOrDefault("jobIndex", "0");
         String velaAppDescription = repoName+"-"+System.getenv("GITHUB_WORKFLOW") + "-"+System.getenv("GITHUB_RUN_ID") + "@"+paramsMap.get("version");
 
 
@@ -102,7 +92,6 @@ public class Main {
             SetConfig setConfig = new SetConfig();
             String kubeConfigPath = setConfig.setConfig(paramsMap.get("askConfig"));
             setConfig.setKubeClientConfig(kubeConfigPath);
-            System.out.println("KUBECONFIG: "+System.getenv("KUBECONFIG"));
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
             if(repoTest!=null) {
                 new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, paramsMap.get("askConfig"));
