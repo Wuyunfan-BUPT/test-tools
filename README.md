@@ -46,7 +46,7 @@ docker run -it test-tools -testRepo=nacos -version=123456 -jobIndex=1 -askConfig
 Attention: if you use this resposity dockerfile, make sure all params input and are in order. Example follow：
 #### rocketmq example
 ```
-deploy:
+test:
     name: Deploy RocketMQ
     runs-on: ubuntu-latest
     steps:
