@@ -23,6 +23,7 @@ EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
 # ENV KUBECONFIG=/root/.kube/config
+ENV KUBECONFIG="${HOME}/.kube/config"
 
 
 RUN mvn clean install \
