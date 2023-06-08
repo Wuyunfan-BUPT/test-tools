@@ -178,7 +178,7 @@ public class nacosTestImpl implements RepoTest {
         return new QueryTestPod().getPodResult(testPodName, namespace, testCmd, testCodePath);
     }
     @Override
-    public void clean() throws IOException {
-        new ProjectClean().clean(contextMap.get("env"), contextMap.get("env"));
+    public boolean clean() throws IOException {
+        return new ProjectClean().clean(contextMap.get("env"), contextMap.get("env"));
     }
 }

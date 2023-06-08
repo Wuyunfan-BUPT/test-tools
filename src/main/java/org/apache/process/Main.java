@@ -80,20 +80,36 @@ public class Main {
             String kubeConfigPath = setConfig.setConfig(paramsMap.get("askConfig"));
             setConfig.setKubeClientConfig(kubeConfigPath);
             RepoTest repoTest =new TestImplLoader(paramsMap.get("testRepo"), paramsMap).getRepoTest();
-            if(repoTest!=null) {
+            if(repoTest!=null){
                 new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, paramsMap.get("askConfig"));
+            }else{
+                System.out.printf("Not support %s! %n", paramsMap.get("testRepo"));
+                System.exit(1);
+            }
+            if("deploy".equals(paramsMap.get("action"))){
                 if(!repoTest.deploy()){
                     System.out.println("Deploy error!");
                     System.exit(1);
                 }
-                boolean isSuccess = repoTest.testRepo();
-                repoTest.clean();
-                if(isSuccess) {
-                    System.exit(0);
-                }
-            }else{
-                System.out.printf("Not support %s! %n", paramsMap.get("testRepo"));
+                System.exit(0);
             }
+            if("e2e-test".equals(paramsMap.get("action"))){
+                if(!repoTest.testRepo()){
+                    System.out.println("e2e-test error!");
+                    System.exit(1);
+                }
+                System.exit(0);
+            }
+            if("clean".equals(paramsMap.get("action"))){
+                if(!repoTest.clean()){
+                    System.out.println("clean error!");
+                    System.exit(1);
+                }
+                System.exit(0);
+            }
+            System.out.println("No action execute!");
+            System.exit(0);
+
         }catch(Exception e){
             e.printStackTrace();
         }

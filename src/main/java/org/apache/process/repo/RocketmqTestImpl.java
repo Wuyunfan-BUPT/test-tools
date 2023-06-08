@@ -171,7 +171,7 @@ public class RocketmqTestImpl implements RepoTest {
 
     }
     @Override
-    public void clean() throws IOException {
-        new ProjectClean().clean(contextMap.get("env"), contextMap.get("env"));
+    public boolean clean() throws IOException {
+       return  new ProjectClean().clean(contextMap.get("env"), contextMap.get("env"));
     }
 }

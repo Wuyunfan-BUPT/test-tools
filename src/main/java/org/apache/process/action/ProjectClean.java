@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProjectClean {
     public ProjectClean(){}
-    public void clean(String namespace, String appName){
+    public boolean clean(String namespace, String appName){
         System.out.println("************************************");
         System.out.println("*       Delete app and env...      *");
         System.out.println("************************************");
@@ -64,7 +64,7 @@ public class ProjectClean {
             System.out.printf("vela namespace:%s delete success!%n", namespace);
         }catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
+            return false;
         }
 
         /* delete kubernetes pods and relevant namespace */
@@ -73,6 +73,8 @@ public class ProjectClean {
             System.out.println("Namespace " + namespace + " deleted successfully.");
         }catch (ApiException e){
             System.err.println("Failed to delete namespace " + namespace + ": " + e.getResponseBody());
+            return false;
         }
+        return true;
     }
 }

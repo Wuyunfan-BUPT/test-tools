@@ -40,6 +40,6 @@ public interface RepoTest {
     /**
      * Clean env.
      */
-    void clean() throws IOException;
+    boolean clean() throws IOException;
 
 }
