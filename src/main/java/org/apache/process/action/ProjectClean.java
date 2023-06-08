@@ -56,12 +56,19 @@ public class ProjectClean {
             System.out.printf("vela application:%s delete success!%n", appName);
             EnvActions envActions = new EnvActions();
             isDeletedsuccessed = false;
-            while(!isDeletedsuccessed){
+            int times = 90;
+            while(!isDeletedsuccessed &&times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(envActions.deleteEnv(namespace));
                 TimeUnit.SECONDS.sleep(2);
                 authAction.setToken("refresh_token");
+                times--;
             }
-            System.out.printf("vela namespace:%s delete success!%n", namespace);
+            if(times<=0){
+                System.out.printf("vela namespace:%s delete fail!%n", namespace);
+                return false;
+            }else{
+                System.out.printf("vela namespace:%s delete success!!%n", namespace);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return false;
