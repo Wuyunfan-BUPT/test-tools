@@ -94,12 +94,11 @@ public class nacosTestImpl implements RepoTest {
 
         /* get all nacos cluster IP */
         V1PodList pods = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null);
-        List<String> serverListIP = new ArrayList<>();
+        StringBuilder allIP = new StringBuilder();
         for (V1Pod pod : pods.getItems()) {
-            if (pod.getMetadata().getLabels() != null && "nacos".equals(pod.getMetadata().getLabels().get("app.kubernetes.io/instance"))) {
-                serverListIP.add(pod.getStatus().getPodIP() + ":" + nacosPort);
-            }
+            allIP.append(pod.getMetadata().getName()).append(":").append(pod.getStatus().getPodIP()).append(",");
         }
+        System.out.println(allIP);
 
         System.out.println("**************create pod***************");
         /* create pod */
@@ -163,14 +162,10 @@ public class nacosTestImpl implements RepoTest {
         container.addEnvItem(v1EnvVar4);
 
         V1EnvVar v1EnvVar5 = new V1EnvVar();
-        v1EnvVar5.setName("serverList");
-        StringBuilder serverList = new StringBuilder();
-        for (String serverIP : serverListIP) {
-            serverList.append(serverIP).append(",");
-        }
-        System.out.println(serverList.substring(0, serverList.length() - 1));
-        v1EnvVar5.setValue(serverList.substring(0, serverList.length() - 1));
+        v1EnvVar5.setName("ALL_IP");
+        v1EnvVar5.setValue(allIP.substring(0, allIP.length() - 1));
         container.addEnvItem(v1EnvVar5);
+
         // add container to spec
         pod_template_spec.addContainersItem(container);
 
