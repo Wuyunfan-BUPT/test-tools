@@ -73,7 +73,7 @@ inputs:
   jobIndex: # id of input
     description: 'job id'
     required: false
-    default: ''
+    default: '0'
   helmValue: # id of input
     description: 'helm values'
     required: true
