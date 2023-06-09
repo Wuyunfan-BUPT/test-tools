@@ -44,7 +44,7 @@ public class ProjectClean {
         /* delete vela application and namespace */
         try{
             AuthAction authAction = new AuthAction();
-            authAction.setToken("refresh_token");
+            authAction.setToken("login");
             AppActions appActions = new AppActions();
             appActions.deleteOAM(namespace, appName).close();
             boolean isDeletedsuccessed = false;
