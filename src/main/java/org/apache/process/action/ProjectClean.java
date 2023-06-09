@@ -48,30 +48,27 @@ public class ProjectClean {
             AppActions appActions = new AppActions();
             appActions.deleteOAM(namespace, appName).close();
             boolean isDeletedsuccessed = false;
-            while(!isDeletedsuccessed){
+            int times = 50;
+            while(!isDeletedsuccessed && times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(appActions.deleteApplication(appName));
                 TimeUnit.SECONDS.sleep(2);
                 authAction.setToken("refresh_token");
+                times--;
             }
-            System.out.printf("vela application:%s delete success!%n", appName);
+            PrintInfo.isSuccess(times, String.format("vela application:%s delete %n", appName));
+
             EnvActions envActions = new EnvActions();
             isDeletedsuccessed = false;
-            int times = 90;
-            while(!isDeletedsuccessed &&times>0){
+            times = 50;
+            while(!isDeletedsuccessed && times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(envActions.deleteEnv(namespace));
                 TimeUnit.SECONDS.sleep(2);
                 authAction.setToken("refresh_token");
                 times--;
             }
-            if(times<=0){
-                System.out.printf("vela namespace:%s delete fail!%n", namespace);
-                return false;
-            }else{
-                System.out.printf("vela namespace:%s delete success!!%n", namespace);
-            }
+            PrintInfo.isSuccess(times, String.format("vela namespace:%s delete %n", appName));
         }catch (Exception e){
             e.printStackTrace();
-            return false;
         }
 
         /* delete kubernetes pods and relevant namespace */

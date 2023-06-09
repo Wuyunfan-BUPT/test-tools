@@ -93,7 +93,7 @@ public class Main {
                 }
                 System.exit(0);
             }
-            if("e2e-test".equals(paramsMap.get("action"))){
+            if("test".equals(paramsMap.get("action"))){
                 if(!repoTest.testRepo()){
                     System.out.println("e2e-test error!");
                     System.exit(1);
@@ -102,14 +102,12 @@ public class Main {
             }
             if("clean".equals(paramsMap.get("action"))){
                 if(!repoTest.clean()){
-                    System.out.println("clean error!");
-                    System.exit(1);
+                    System.out.println("Attention: clean error!");
                 }
                 System.exit(0);
             }
             System.out.println("No action execute!");
             System.exit(0);
-
         }catch(Exception e){
             e.printStackTrace();
         }

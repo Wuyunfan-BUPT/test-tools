@@ -48,4 +48,14 @@ public class PrintInfo {
        response.close();
        return isSuccessed;
     }
+
+    public static boolean isSuccess(int times, String message){
+        if(times<=0){
+            System.out.printf("%s fail!%n", message);
+            return false;
+        }else{
+            System.out.printf("%s success!!%n", message);
+            return true;
+        }
+    }
 }
