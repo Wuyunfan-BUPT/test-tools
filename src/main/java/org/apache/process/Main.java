@@ -65,7 +65,7 @@ public class Main {
         }
 
         String repoName = paramsMap.get("testRepo");
-        String env = repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+ paramsMap.getOrDefault("jobIndex", "0");
+        String env = repoName+"-"+System.getenv("GITHUB_RUN_ID")+"-"+ paramsMap.getOrDefault("jobIndex", null);
         String velaAppDescription = repoName+"-"+System.getenv("GITHUB_WORKFLOW") + "-"+System.getenv("GITHUB_RUN_ID") + "@"+paramsMap.get("version");
 
 
