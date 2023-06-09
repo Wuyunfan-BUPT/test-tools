@@ -85,7 +85,6 @@ public class nacosTestImpl implements RepoTest {
         String testCodeBranch = contextMap.getOrDefault("testCodeBranch", "master");
         String testCodePath = contextMap.getOrDefault("testCodePath", "java/nacos-2X");
         String testCmdBase = contextMap.getOrDefault("testCmdBase", "mvn clean test -B");
-        String nacosPort = "8848";
 
 //        ApiClient client = Config.defaultClient();
 //        Configuration.setDefaultApiClient(client);
