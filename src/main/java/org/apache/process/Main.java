@@ -107,7 +107,7 @@ public class Main {
                 System.exit(0);
             }
             System.out.println("No action execute!");
-            System.exit(0);
+            System.exit(1);
         }catch(Exception e){
             e.printStackTrace();
         }
