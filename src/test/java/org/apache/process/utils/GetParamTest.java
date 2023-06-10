@@ -10,7 +10,7 @@ import static org.apache.process.utils.GetParam.parseParams;
 
 public class GetParamTest {
     @Test
-    public void testParseParams() throws Exception{
+    public void testParseParams() {
         String helmvalues =
                 "global:\n" +
                         "  mode: standalone\n" +
@@ -30,7 +30,7 @@ public class GetParamTest {
                         "  nodePort: 30009\n" +
                         "  type: ClusterIP";
         String params = "username: nacos\n" +
-                "password: hello\n" +
+                "password: nacos\n" +
                 "cmd: mvn -B install\n"+
                 "helm:\n" +
                 "  chart: java/e2e\n"+
@@ -63,6 +63,8 @@ public class GetParamTest {
             System.out.println(key+": "+ mapp.get(key));
         }
         Assert.assertEquals(mapp.get("username"), "nacos");
+        Assert.assertEquals(mapp.get("password"), "nacos");
+        Assert.assertEquals(mapp.get("cmd"), "mvn -B install");
         Assert.assertEquals(Deploymodel.generateComponentProperties(helmvalues,"java/e2e","master", "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git").length(), mapp.get("helm:").length());
         System.out.println(mapp.get("helm:"));
     }
