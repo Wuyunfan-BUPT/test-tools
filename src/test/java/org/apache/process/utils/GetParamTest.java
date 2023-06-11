@@ -5,12 +5,65 @@ import org.apache.process.model.Deploymodel;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
-import static org.apache.process.utils.GetParam.parseParams;
+import static org.apache.process.utils.GetParam.*;
 
 public class GetParamTest {
     @Test
-    public void testParseParams() {
+    public void testyamlToMap() {
+        String input ="action: test\n" +
+                "ask-config: \"${{ secrets.ASK_CONFIG_VIRGINA }}\"\n" +
+                "API_VERSION: \"v1\"\n" +
+                "KIND: \"Pod\"\n" +
+                "RESTART_POLICY: \"Never\" \n" +
+                "ENV:\n" +
+                "  CODE: https://github.com/nacos-group/nacos-e2e.git\n" +
+                "  BRANCH: master\n" +
+                "  CODE_PATH: java/nacos-2X\n" +
+                "  CMD: mvn clean test -B\n" +
+                "  ALL_IP: null\n" +
+                "CONTAINER:\n" +
+                "  IMAGE: \"cloudnativeofalibabacloud/test-runner:v0.0.1\"\n" +
+                "  RESOURCE_LIMITS:\n" +
+                "    cpu: 8\n" +
+                "    memory: 8Gi\n" +
+                "  RESOURCE_REQUIRE:\n" +
+                "    cpu: 8\n" +
+                "    memory: 8Gi";
+
+        LinkedHashMap<String, Object> paramsMap = yamlToMap(input);
+        Assert.assertEquals(paramsMap.get("action"), "test");
+        Assert.assertEquals(paramsMap.get("ask-config"), "${{ secrets.ASK_CONFIG_VIRGINA }}");
+        Assert.assertEquals(paramsMap.get("API_VERSION"), "v1");
+        Assert.assertEquals(paramsMap.get("KIND"), "Pod");
+        Assert.assertEquals(paramsMap.get("RESTART_POLICY"), "Never");
+
+
+
+        LinkedHashMap<String, Object> envMap = (LinkedHashMap)paramsMap.get("ENV");
+        Assert.assertEquals(envMap.get("CODE"), "https://github.com/nacos-group/nacos-e2e.git");
+        Assert.assertEquals(envMap.get("BRANCH"), "master");
+        Assert.assertEquals(envMap.get("CODE_PATH"), "java/nacos-2X");
+        Assert.assertEquals(envMap.get("CMD"), "mvn clean test -B");
+        Assert.assertNull(envMap.get("ALL_IP"));
+
+
+
+        LinkedHashMap<String, Object>  containerMap = (LinkedHashMap)paramsMap.get("CONTAINER");
+        Assert.assertEquals(containerMap.get("IMAGE"), "cloudnativeofalibabacloud/test-runner:v0.0.1");
+
+        LinkedHashMap<String, Object>  limitsMap = (LinkedHashMap)containerMap.get("RESOURCE_LIMITS");
+        Assert.assertEquals(limitsMap.get("cpu").toString(), "8");
+        Assert.assertEquals(limitsMap.get("memory"), "8Gi");
+
+        LinkedHashMap<String, Object>  requireMap = (LinkedHashMap)containerMap.get("RESOURCE_REQUIRE");
+        Assert.assertEquals(requireMap.get("cpu").toString(), "8");
+        Assert.assertEquals(requireMap.get("memory"), "8Gi");
+    }
+
+    @Test
+    public void testParseDeployInput() {
         String helmvalues =
                 "global:\n" +
                         "  mode: standalone\n" +
@@ -57,15 +110,11 @@ public class GetParamTest {
                 "    service:\n" +
                 "      nodePort: 30009\n" +
                 "      type: ClusterIP";
-        String target = "helm:";
-        HashMap<String, String> mapp = parseParams(params, target);
-        for(String key: mapp.keySet()){
-            System.out.println(key+": "+ mapp.get(key));
-        }
-        Assert.assertEquals(mapp.get("username"), "nacos");
-        Assert.assertEquals(mapp.get("password"), "nacos");
-        Assert.assertEquals(mapp.get("cmd"), "mvn -B install");
-        Assert.assertEquals(Deploymodel.generateComponentProperties(helmvalues,"java/e2e","master", "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git").length(), mapp.get("helm:").length());
-        System.out.println(mapp.get("helm:"));
+        String target = "helm";
+        HashMap<String, Object> paramsMap =  parseDeployInput(params, target);
+        Assert.assertEquals(paramsMap.get("username"), "nacos");
+        Assert.assertEquals(paramsMap.get("password"), "nacos");
+        Assert.assertEquals(paramsMap.get("cmd"), "mvn -B install");
+        Assert.assertEquals(Deploymodel.generateComponentProperties(helmvalues,"java/e2e","master", "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git").length(), paramsMap.get("helm").toString().length());
     }
 }

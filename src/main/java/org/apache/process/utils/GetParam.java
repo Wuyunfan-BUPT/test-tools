@@ -25,8 +25,7 @@ import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
 public class GetParam {
     public HashMap<String, String> setParam(CommandLine cmd) {
@@ -38,27 +37,15 @@ public class GetParam {
         return result;
     }
 
-    public static HashMap<String, String> parseParams(String s, String target){
-        StringBuilder builder = new StringBuilder();
-        StringBuilder targetBuilder = new StringBuilder();
-        String[] lines = s.split("\n");
-        boolean isTargetText = false;
-        for(String line:lines){
-            if(line.startsWith(target)){
-                isTargetText = true;
-                continue;
-            }
-            if(isTargetText && line.startsWith("  ")){
-                targetBuilder.append(line).append("\n");
-            }else{
-                builder.append("  ").append(line).append("\n");
-                isTargetText = false;
-            }
-        }
+    public static LinkedHashMap<String, Object> yamlToMap(String input){
         Yaml yaml = new Yaml();
-        HashMap<String,String> builderMap= (HashMap<String,String>) yaml.load(builder.toString());
-        HashMap<String,String> targetMap= (HashMap<String, String>) yaml.load(targetBuilder.toString());
-        JSONObject jsonObject=new JSONObject(targetMap);
+        return (LinkedHashMap<String,Object>) yaml.load(input);
+    }
+
+    public static HashMap<String, Object> parseDeployInput(String input,String target){
+        LinkedHashMap<String,Object> builderMap = yamlToMap(input);
+        LinkedHashMap<String,Object> helmValuesMap = (LinkedHashMap<String,Object>)builderMap.get(target);
+        JSONObject jsonObject=new JSONObject(helmValuesMap);
         builderMap.put(target, jsonObject.toString().replaceAll("\"", "\\\\\"").toString());
         return builderMap;
     }
