@@ -13,6 +13,7 @@ public class GetParamTest {
     @Test
     public void testyamlToMap() {
         String input ="action: test\n" +
+                "namespace: nacos-12345562-2331\n" +
                 "ask-config: \"${{ secrets.ASK_CONFIG_VIRGINA }}\"\n" +
                 "API_VERSION: \"v1\"\n" +
                 "KIND: \"Pod\"\n" +
@@ -21,7 +22,7 @@ public class GetParamTest {
                 "  CODE: https://github.com/nacos-group/nacos-e2e.git\n" +
                 "  BRANCH: master\n" +
                 "  CODE_PATH: java/nacos-2X\n" +
-                "  CMD: mvn clean test -B\n" +
+                "  CMD: mvn clean test -B -Dnacos.client.version=2.2.3\n" +
                 "  ALL_IP: null\n" +
                 "CONTAINER:\n" +
                 "  IMAGE: \"cloudnativeofalibabacloud/test-runner:v0.0.1\"\n" +
@@ -34,6 +35,7 @@ public class GetParamTest {
 
         LinkedHashMap<String, Object> paramsMap = yamlToMap(input);
         Assert.assertEquals(paramsMap.get("action"), "test");
+        Assert.assertEquals(paramsMap.get("namespace"), "nacos-12345562-2331");
         Assert.assertEquals(paramsMap.get("ask-config"), "${{ secrets.ASK_CONFIG_VIRGINA }}");
         Assert.assertEquals(paramsMap.get("API_VERSION"), "v1");
         Assert.assertEquals(paramsMap.get("KIND"), "Pod");
