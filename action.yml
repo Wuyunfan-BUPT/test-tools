@@ -18,6 +18,10 @@
 name: 'Cloud Native CI Action'
 description: ''
 inputs:
+  yamlString: # yalm string
+    description: : 'all params'
+    required: true
+    default: ""
   testRepo: # id of input
     description: 'rocketmq or nacos'
     required: true
