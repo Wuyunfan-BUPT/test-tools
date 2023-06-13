@@ -22,83 +22,83 @@ inputs:
     description: 'all params'
     required: true
     default: ""
-  testRepo: # id of input
-    description: 'rocketmq or nacos'
-    required: true
-    default: 'rocketmq'
-  action: # id of input
-    description: 'action'
-    required: false
-    default: ''
-  version: # id of input
-    description: 'test version'
-    required: false
-    default: ''
-  askConfig:  # id of input
-    description: 'askConfig'
-    required: true
-    default: ''
-  velauxUsername: # id of input
-    description: 'velaxUX username'
-    required: true
-    default: ''
-  velauxPassword: # id of input
-    description: 'velaUX password'
-    required: true
-    default: ''
-  chartGit: # id of input
-    description: 'chart git'
-    required: false
-    default: ''
-  chartBranch: # id of input
-    description: 'chart branch'
-    required: false
-    default: ''
-  chartPath: # id of input
-    description: 'chart path'
-    required: false
-    default: './'
-  testCodeGit: # id of input
-    description: 'test code git'
-    required: false
-    default: ''
-  testCodeBranch: # id of input
-    description: 'test code branch'
-    required: false
-    default: ''
-  testCodePath: # id of input
-    description: 'test code path'
-    required: false
-    default: ''
-  testCmdBase: # id of input
-    description: 'test cmd'
-    required: false
-    default: 'mvn -B test'
-  jobIndex: # id of input
-    description: 'job id'
-    required: false
-    default: ''
-  helmValue: # id of input
-    description: 'helm values'
-    required: true
-    default: ''
+#  testRepo: # id of input
+#    description: 'rocketmq or nacos'
+#    required: true
+#    default: 'rocketmq'
+#  action: # id of input
+#    description: 'action'
+#    required: false
+#    default: ''
+#  version: # id of input
+#    description: 'test version'
+#    required: false
+#    default: ''
+#  askConfig:  # id of input
+#    description: 'askConfig'
+#    required: true
+#    default: ''
+#  velauxUsername: # id of input
+#    description: 'velaxUX username'
+#    required: true
+#    default: ''
+#  velauxPassword: # id of input
+#    description: 'velaUX password'
+#    required: true
+#    default: ''
+#  chartGit: # id of input
+#    description: 'chart git'
+#    required: false
+#    default: ''
+#  chartBranch: # id of input
+#    description: 'chart branch'
+#    required: false
+#    default: ''
+#  chartPath: # id of input
+#    description: 'chart path'
+#    required: false
+#    default: './'
+#  testCodeGit: # id of input
+#    description: 'test code git'
+#    required: false
+#    default: ''
+#  testCodeBranch: # id of input
+#    description: 'test code branch'
+#    required: false
+#    default: ''
+#  testCodePath: # id of input
+#    description: 'test code path'
+#    required: false
+#    default: ''
+#  testCmdBase: # id of input
+#    description: 'test cmd'
+#    required: false
+#    default: 'mvn -B test'
+#  jobIndex: # id of input
+#    description: 'job id'
+#    required: false
+#    default: ''
+#  helmValue: # id of input
+#    description: 'helm values'
+#    required: true
+#    default: ''
 runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
     - ${{ inputs.yamlString }}
-    - ${{ inputs.testRepo }}
-    - ${{ inputs.action }}
-    - ${{ inputs.version }}
-    - ${{ inputs.askConfig }}
-    - ${{ inputs.velauxUsername }}
-    - ${{ inputs.velauxPassword }}
-    - ${{ inputs.chartGit }}
-    - ${{ inputs.chartBranch }}
-    - ${{ inputs.chartPath }}
-    - ${{ inputs.testCodeGit }}
-    - ${{ inputs.testCodeBranch }}
-    - ${{ inputs.testCodePath }}
-    - ${{ inputs.testCmdBase }}
-    - ${{ inputs.jobIndex }}
-    - ${{ inputs.helmValue }}
+#    - ${{ inputs.testRepo }}
+#    - ${{ inputs.action }}
+#    - ${{ inputs.version }}
+#    - ${{ inputs.askConfig }}
+#    - ${{ inputs.velauxUsername }}
+#    - ${{ inputs.velauxPassword }}
+#    - ${{ inputs.chartGit }}
+#    - ${{ inputs.chartBranch }}
+#    - ${{ inputs.chartPath }}
+#    - ${{ inputs.testCodeGit }}
+#    - ${{ inputs.testCodeBranch }}
+#    - ${{ inputs.testCodePath }}
+#    - ${{ inputs.testCmdBase }}
+#    - ${{ inputs.jobIndex }}
+#    - ${{ inputs.helmValue }}
