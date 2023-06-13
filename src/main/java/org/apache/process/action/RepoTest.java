@@ -81,9 +81,7 @@ public class RepoTest {
             /* get all IP */
             V1PodList pods = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null);
             StringBuilder allIP = new StringBuilder();
-            System.out.println("come in");
             for (V1Pod pod : pods.getItems()) {
-                System.out.println("------------");
                 allIP.append(pod.getMetadata().getName()).append(":").append(pod.getStatus().getPodIP()).append(",");
             }
             envMap.put("ALL_IP", allIP.substring(0, allIP.length()-1));
