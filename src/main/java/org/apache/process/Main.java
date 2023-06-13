@@ -35,7 +35,7 @@ import static org.apache.process.utils.GetParam.parseDeployInput;
 import static org.apache.process.utils.GetParam.yamlToMap;
 
 public class Main {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         /* define input parameters */
         Options options = new Options();
         options.addOption(Option.builder("yamlString").longOpt("yamlString").argName("yamlString").desc("yaml String").hasArg().required(true).build());
@@ -49,46 +49,48 @@ public class Main {
             cmd = parser.parse(options, args);
             GetParam getParam = new GetParam();
             paramsMap = getParam.setParam(cmd);
-        }catch (ParseException e) {
+        } catch (ParseException e) {
             System.out.println(e.getMessage());
             helper.printHelp("Usage:", options);
             System.exit(1);
         }
 
-        try{
+        try {
             System.out.println();
             String inputYamlString = paramsMap.get("yamlString");
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
 
             String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString().replace("\\n", ""));
-            String velaUsername = inputMap.getOrDefault("velauxUsername", null).toString();
-            String velaPassword = inputMap.getOrDefault("velauxPassword", null).toString();
-            Configs.VELAUX_USERNAME = velaUsername;
-            Configs.VELAUX_PASSWORD = velaPassword;
+            if (inputMap.getOrDefault("velauxUsername", null) != null) {
+                Configs.VELAUX_USERNAME = inputMap.get("velauxUsername").toString();
+            }
+            if (inputMap.getOrDefault("velauxPassword", null) != null) {
+                Configs.VELAUX_PASSWORD = inputMap.get("velauxPassword").toString();
+            }
+
             SetConfig setConfig = new SetConfig();
             String kubeConfigPath = setConfig.setConfig(askConfig);
             setConfig.setKubeClientConfig(kubeConfigPath);
             new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, askConfig);
 
             boolean isSuccessed = false;
-            if("deploy".equals(action)){
+            if ("deploy".equals(action)) {
                 HashMap<String, Object> deployMap = parseDeployInput(inputYamlString, "helm");
                 isSuccessed = new Deploy().startDeploy(deployMap);
-            } else if("test".equals(action)){
+            } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
                 isSuccessed = new RepoTest().runTest(inputMap);
-            }
-            else if("clean".equals(action)){
+            } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
-            }else{
+            } else {
                 System.out.println("Error! Please input action!");
             }
-            if(isSuccessed){
+            if (isSuccessed) {
                 System.exit(0);
             }
             System.exit(1);
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.exit(1);
