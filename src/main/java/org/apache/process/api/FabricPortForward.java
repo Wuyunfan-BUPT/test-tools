@@ -35,16 +35,12 @@ import java.util.concurrent.TimeUnit;
 
 public class FabricPortForward {
         public void podPortForward(String namespace, String podLabels, int localPort, String config){
-            System.out.println("com in podProtForward");
 
             try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
                 PodList pode = client.pods().inNamespace(namespace).list();
-                System.out.println("come in client");
                 for(Pod p:pode.getItems()){
-                    System.out.println(" come in circle");
                     String labels = p.getMetadata().getLabels().get("app.oam.dev/name");
                     if (podLabels.equals(labels)) {
-                        System.out.println("find label");
                         int containerPort = p.getSpec().getContainers().get(0).getPorts().get(0).getContainerPort();
                         client.pods().inNamespace(namespace).withName(p.getMetadata().getName()).waitUntilReady(10, TimeUnit.SECONDS);
 
@@ -61,11 +57,7 @@ public class FabricPortForward {
                         portForward.close();
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
