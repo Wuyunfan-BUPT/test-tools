@@ -1,4 +1,7 @@
 target/
+test_report1/
+testlog.tar.gz
+testlog1.txt
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
