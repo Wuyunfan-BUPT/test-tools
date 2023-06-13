@@ -69,9 +69,7 @@ public class Main {
             SetConfig setConfig = new SetConfig();
             String kubeConfigPath = setConfig.setConfig(askConfig);
             setConfig.setKubeClientConfig(kubeConfigPath);
-            PortForward portForward= new PortForward();
-            portForward.startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, askConfig);
-            Thread.sleep(10000);
+            new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, askConfig);
 
             boolean isSuccessed = false;
             if("deploy".equals(action)){
