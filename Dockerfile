@@ -22,7 +22,7 @@ MAINTAINER wuyfee "wyf_mohen@163.com"
 EXPOSE  9082
 COPY src /src
 COPY pom.xml /pom.xml
-#ENV KUBECONFIG=/root/.kube/config
+ENV KUBECONFIG=/root/.kube/config
 
 
 RUN mvn clean install -Dmaven.test.skip=true \
