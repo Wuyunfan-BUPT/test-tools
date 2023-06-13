@@ -19,7 +19,7 @@ name: 'Cloud Native CI Action'
 description: ''
 inputs:
   yamlString: # yalm string
-    description: : 'all params'
+    description: 'all params'
     required: true
     default: ""
   testRepo: # id of input
