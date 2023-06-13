@@ -67,12 +67,16 @@ public class QueryTestPod {
 
                     isWaitingTest = false;
 
+                    Path filePath = Paths.get("testlog.txt");
+                    if (!Files.exists(filePath)) {
+                        Files.createDirectory(filePath);
+                    }
+                    downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
+
                     Path dirPath = Paths.get("test_report");
                     if (!Files.exists(dirPath)) {
                         Files.createDirectory(dirPath);
                     }
-                    downloadDir(config, namespace, testPodName, testPodName, "/root/testlog.txt", dirPath);
-
                     downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
                 }
             }
@@ -82,15 +86,13 @@ public class QueryTestPod {
         return !"Failed".equals(podStatus);
     }
 
-    public boolean downloadFile(String config, String namespace, String podName, String containerName, String srcPath, Path targetPath) {
+    public void downloadFile(String config, String namespace, String podName, String containerName, String srcPath, Path targetPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).file(srcPath).copy(targetPath);
             System.out.printf("File(%s) copied successfully!%n", srcPath);
-            return true;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.printf("Fail to get %s!%n", srcPath);
-            return false;
         }
     }
 
