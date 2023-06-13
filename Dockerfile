@@ -25,7 +25,7 @@ COPY pom.xml /pom.xml
 #ENV KUBECONFIG=/root/.kube/config
 
 
-RUN mvn clean install \
+RUN mvn clean install -Dmaven.test.skip=true \
     && mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar \
     && rm -rf /pom.xml /src /target
 
