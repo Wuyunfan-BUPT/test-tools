@@ -35,7 +35,6 @@ public class EnvActions {
     public Response listEnv() throws IOException {
         OkHttpClient client = new OkHttpClient();
 
-
         Request request = new Request.Builder()
                 .url(URL)
                 .get()
