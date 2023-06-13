@@ -37,7 +37,6 @@ public class SetConfig {
 
         LOGGER.info("Set config... ");
         String usrHome = System.getProperty("user.home");
-        System.out.println(usrHome);
         String kubeDirPath = String.format("%s/.kube", usrHome);
         File kubeDir = new File(kubeDirPath);
         if (!kubeDir.exists() && !kubeDir.mkdirs()) {
@@ -45,8 +44,6 @@ public class SetConfig {
             System.out.printf("%s directory create fail！%n", kubeDirPath);
         }
         String kubeFilePath = String.format("%s/.kube/config", usrHome);
-        //Configs.KUBECONFIG_PATH = kubeFilePath;
-        //setKubeClientConfig(kubeFilePath);
         File kubeFile = new File(kubeFilePath);
         if (kubeDir.exists()) {
             kubeFile.delete();
