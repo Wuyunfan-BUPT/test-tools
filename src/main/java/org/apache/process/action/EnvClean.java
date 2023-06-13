@@ -26,45 +26,50 @@ import org.apache.process.api.AuthAction;
 import org.apache.process.api.EnvActions;
 import org.apache.process.utils.PrintInfo;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class ProjectClean {
-    public ProjectClean(){}
-    public void clean(String namespace, String appName){
+
+public class EnvClean {
+    public EnvClean(){}
+    public boolean clean(HashMap<String, Object> paramsMap){
         System.out.println("************************************");
         System.out.println("*       Delete app and env...      *");
         System.out.println("************************************");
 
-//        ApiClient client = Config.fromConfig(Configs.KUBECONFIG_PATH);
-//        //ApiClient client = Config.defaultClient();
-//        Configuration.setDefaultApiClient(client);
-
         CoreV1Api api = new CoreV1Api();
+        String namespace = paramsMap.get("namespace").toString();
 
+        boolean result = true;
         /* delete vela application and namespace */
         try{
             AuthAction authAction = new AuthAction();
-            authAction.setToken("refresh_token");
+            authAction.setToken("login");
             AppActions appActions = new AppActions();
-            appActions.deleteOAM(namespace, appName).close();
+            appActions.deleteOAM(namespace, namespace).close();
             boolean isDeletedsuccessed = false;
-            while(!isDeletedsuccessed){
-                isDeletedsuccessed = PrintInfo.isResponseSuccess(appActions.deleteApplication(appName));
-                TimeUnit.SECONDS.sleep(2);
+            int times = 10;
+            while(!isDeletedsuccessed && times>0){
+                isDeletedsuccessed = PrintInfo.isResponseSuccess(appActions.deleteApplication(namespace));
+                TimeUnit.SECONDS.sleep(3);
+                times--;
                 authAction.setToken("refresh_token");
             }
-            System.out.printf("vela application:%s delete success!%n", appName);
+            System.out.printf("vela application:%s delete success!%n", namespace);
             EnvActions envActions = new EnvActions();
             isDeletedsuccessed = false;
-            while(!isDeletedsuccessed){
+            times = 10;
+            while(!isDeletedsuccessed && times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(envActions.deleteEnv(namespace));
-                TimeUnit.SECONDS.sleep(2);
+                TimeUnit.SECONDS.sleep(3);
+                times --;
                 authAction.setToken("refresh_token");
             }
             System.out.printf("vela namespace:%s delete success!%n", namespace);
         }catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
+            System.out.println("Fail to delete vela application/namespace!");
+            result = false;
         }
 
         /* delete kubernetes pods and relevant namespace */
@@ -73,6 +78,8 @@ public class ProjectClean {
             System.out.println("Namespace " + namespace + " deleted successfully.");
         }catch (ApiException e){
             System.err.println("Failed to delete namespace " + namespace + ": " + e.getResponseBody());
+            result = false;
         }
+        return result;
     }
 }
