@@ -31,11 +31,9 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.process.utils.GetParam.parseDeployInput;
-
 
 public class Deploy {
-    public boolean startDeploy(String deployInput) throws  InterruptedException {
+    public boolean startDeploy(HashMap<String, Object> paramsMap) throws  InterruptedException {
         System.out.println("************************************");
         System.out.println("*     Create namespace and deploy...     *");
         System.out.println("************************************");
@@ -44,10 +42,7 @@ public class Deploy {
         authAction.setToken("login");
         TimeUnit.SECONDS.sleep(1);
 
-        HashMap<String, Object> paramsMap = parseDeployInput(deployInput, "helm");
         String namespace = paramsMap.get("namespace").toString();
-
-
 
         System.out.printf("Generate namespace(%s) and namespace namespace(%s)%n", namespace, namespace);
         try{
@@ -87,7 +82,7 @@ public class Deploy {
 
         System.out.printf("Query %s Application status%n",namespace);
 
-        int querryTime = 120;
+        int querryTime = Integer.parseInt(paramsMap.get("waitTimes").toString()) / 5;
             try{
                 while(querryTime>0) {
                     authAction.setToken("refresh_token");
@@ -110,7 +105,7 @@ public class Deploy {
                     } else if ("executing".equals(workflowsStatus)) {
                         System.out.println("waiting...");
                         System.out.println("message: " + message);
-                        querryTime++;
+                        querryTime--;
                         TimeUnit.SECONDS.sleep(5);
                     } else {
                         System.out.println(message);
