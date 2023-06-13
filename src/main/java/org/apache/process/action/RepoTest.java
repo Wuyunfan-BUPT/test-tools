@@ -28,21 +28,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
-import static org.apache.process.utils.GetParam.yamlToMap;
+public class RepoTest {
 
-public class ProjectTest {
-
-    public boolean runTest(String namespace, String input) throws ApiException, IOException, InterruptedException {
+    public boolean runTest(LinkedHashMap<String, Object> inputMap) throws ApiException, IOException, InterruptedException, ExecutionException, TimeoutException {
         System.out.println("**************E2E TEST...***************");
         CoreV1Api api = new CoreV1Api();
 
-        System.out.println("**************create pod***************");
-        /* create pod */
-        LinkedHashMap<String, Object> inputMap = yamlToMap(input);
-        String testPodName = "test-" + inputMap.get("env") + new Random().nextInt(100000);
+        String namespace = inputMap.get("namespace").toString();
+        String testPodName = "test-" + namespace + "-"+ new Random().nextInt(100000);
+        System.out.printf("** namespace: %s **%n", namespace);
         // create a pod
-
         V1Pod pod_template = new V1Pod();
         pod_template.setApiVersion(inputMap.get("API_VERSION").toString());
         pod_template.setKind(inputMap.get("KIND").toString());
@@ -53,7 +51,7 @@ public class ProjectTest {
         pod_template_spec.setRestartPolicy(inputMap.get("RESTART_POLICY").toString());
         // set pod spec: container
         V1Container container = new V1Container();
-        System.out.println("**********************" + testPodName + "****************");
+        System.out.println("*******************" + testPodName + "*******************");
 
 
         // ***********set container***********
@@ -87,7 +85,6 @@ public class ProjectTest {
                 allIP.append(pod.getMetadata().getName()).append(":").append(pod.getStatus().getPodIP()).append(",");
             }
             envMap.put("ALL_IP", allIP.substring(0, allIP.length()-1));
-            System.out.println(allIP);
         }
 
         for(String envKey: envMap.keySet()){
@@ -104,8 +101,7 @@ public class ProjectTest {
         pod_template.setSpec(pod_template_spec);
 
         // create pod
-        V1Pod createdPod = api.createNamespacedPod(namespace, pod_template, null, null, null, null);
-        System.out.println(createdPod.getStatus().getPhase());
-        return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CMD").toString(), envMap.get("CODE_PATH").toString());
+        api.createNamespacedPod(namespace, pod_template, null, null, null, null);
+        return new QueryTestPod().getPodResult(inputMap.get("askConfig").toString(), testPodName, namespace, envMap.get("CODE_PATH").toString());
     }
 }
