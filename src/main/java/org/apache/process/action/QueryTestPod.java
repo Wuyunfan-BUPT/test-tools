@@ -33,7 +33,9 @@ public class QueryTestPod {
     public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath) throws IOException, InterruptedException {
         System.out.println("********************query status and get result********************");
         TimeUnit.SECONDS.sleep(3);
+
         KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
+
         String podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
         if (podStatus == null) {
             podStatus = "Pending";
