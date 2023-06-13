@@ -62,8 +62,10 @@ public class FabricPortForward {
                     }
                 }
             } catch (IOException e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             } catch (InterruptedException e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
