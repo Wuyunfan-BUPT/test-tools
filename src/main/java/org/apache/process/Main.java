@@ -63,7 +63,7 @@ public class Main {
 
             String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString());
             String velaUsername = inputMap.getOrDefault("velaUsername", null).toString();
-            String velaPassword = inputMap.getOrDefault("velaPassword", null).toString();
+            String velaPassword = inputMap.getOrDefault("velauxPassword", null).toString();
             Configs.VELAUX_USERNAME = velaUsername;
             Configs.VELAUX_PASSWORD = velaPassword;
             SetConfig setConfig = new SetConfig();
