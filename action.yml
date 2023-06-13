@@ -86,6 +86,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.yamlString }}
     - ${{ inputs.testRepo }}
     - ${{ inputs.action }}
     - ${{ inputs.version }}
