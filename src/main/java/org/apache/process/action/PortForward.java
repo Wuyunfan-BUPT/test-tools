@@ -24,7 +24,7 @@ import org.apache.process.api.FabricPortForward;
 public class PortForward {
     public void startPortForward(String namespace, String podLabels, int localPort, String config) throws InterruptedException {
         FabricPortForward fabricPortForward = new FabricPortForward();
-        System.out.println("Start port forward...");
+        System.out.println("Start port forward....");
         Thread thread = new Thread(
                 () -> {
                     try {
