@@ -56,11 +56,12 @@ public class Main {
         }
 
         try{
+            System.out.println();
             String inputYamlString = paramsMap.get("yamlString");
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
 
-            String askConfig = Decoder.base64Decoder(inputMap.get("action").toString());
+            String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString());
             String velaUsername = inputMap.getOrDefault("velaUsername", null).toString();
             String velaPassword = inputMap.getOrDefault("velaPassword", null).toString();
             Configs.VELAUX_USERNAME = velaUsername;
