@@ -71,7 +71,7 @@ public class QueryTestPod {
 
                     Path filePath = Paths.get("testlog.txt");
                     if (!Files.exists(filePath)) {
-                        Files.createDirectory(filePath);
+                        Files.createFile(filePath);
                     }
                     downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
 
