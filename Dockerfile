@@ -30,5 +30,3 @@ RUN mvn clean install -Dmaven.test.skip=true \
     && rm -rf /pom.xml /src /target
 
 ENTRYPOINT ["/bin/sh", "-c","java -jar /rocketmq-test-tools.jar -yamlString=\"${0}\" "]
-
-# ENTRYPOINT ["/bin/sh", "-c","java -jar /rocketmq-test-tools.jar -testRepo=\"${0}\" -action=\"${1}\" -version=\"${2}\" -askConfig=\"${3}\" -velauxUsername=\"${4}\" -velauxPassword=\"${5}\" -chartGit=\"${6}\" -chartBranch=\"${7}\" -chartPath=\"${8}\" -testCodeGit=\"${9}\" -testCodeBranch=\"${10}\" -testCodePath=\"${11}\" -testCmdBase=\"${12}\" -jobIndex=\"${13}\" -helmValue=\"${14}\""]
