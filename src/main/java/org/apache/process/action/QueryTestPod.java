@@ -19,28 +19,24 @@
 
 package org.apache.process.action;
 
-import io.kubernetes.client.Copy;
-import io.kubernetes.client.Exec;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+import org.apache.process.api.ExecuteCMD;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public class QueryTestPod {
-    public boolean getPodResult(String testPodName, String namespace, String testCmd, String testCodePath) throws IOException, InterruptedException, ApiException {
+    public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath) throws IOException, InterruptedException {
         System.out.println("********************query status and get result********************");
         TimeUnit.SECONDS.sleep(3);
-//        ApiClient client = Config.defaultClient();
-//        Configuration.setDefaultApiClient(client);
-        CoreV1Api api = new CoreV1Api();
-        String podStatus = api.readNamespacedPod(testPodName, namespace, null).getStatus().getPhase();
+
+        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
+
+        String podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
         if (podStatus == null) {
             podStatus = "Pending";
         }
@@ -48,7 +44,7 @@ public class QueryTestPod {
         boolean isWaitingTest = true;
         while ("Pending".equals(podStatus) || "Running".equals(podStatus)) {
             TimeUnit.SECONDS.sleep(5);
-            podStatus = api.readNamespacedPod(testPodName, namespace, null).getStatus().getPhase();
+            podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
             if (podStatus == null) {
                 podStatus = "Pending";
             }
@@ -60,53 +56,56 @@ public class QueryTestPod {
 
             // Check if the execution of the test program has ended.
             if (isWaitingTest) {
-                StringBuilder stringBuilder = null;
-                try {
-                    Process process = new Exec(api.getApiClient()).exec(namespace, testPodName, new String[]{"/bin/sh", "-c", "ls /root | grep testdone"}, testPodName, false, false);
-
-                    InputStream inputStream = process.getInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                    String line;
-                    stringBuilder = new StringBuilder();
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println(line);
-                        stringBuilder.append(line);
-                    }
-                    reader.close();
-                    inputStream.close();
-                    process.destroy();
+                String cmdOutput = null;
+                try (ExecuteCMD executeCMD = new ExecuteCMD(config)) {
+                    cmdOutput = executeCMD.execCommandOnPod(testPodName, namespace, "/bin/sh", "-c", "ls /root | grep testdone");
                 } catch (Exception e) {
-                    System.out.println("t");
+                    e.printStackTrace();
+                    System.out.println("query error! continue to query...");
                 }
-
                 // if the test program ends, get the result.
-                if (stringBuilder != null && stringBuilder.toString().contains("testdone")) {
-                    System.out.println("Test status: test done");
-                    // mark that the model has been executed
+                if (cmdOutput != null && cmdOutput.contains("testdone")) {
+                    System.out.println("test done !");
+
                     isWaitingTest = false;
-                    if (testCmd.contains("mvn")) {
-                        Path path = Paths.get("test_report");
-                        if (!Files.exists(path)) {
-                            Files.createDirectory(path);
-                        }
-                        if (Files.exists(path)) {
-                            // compress testdone
-                            new Exec(api.getApiClient()).exec(namespace, testPodName, new String[]{"/bin/sh", "-c", "tar -zcvf testlog.tar.gz /root/testlog.txt"}, testPodName, false, false);
-                            TimeUnit.SECONDS.sleep(3);
-                            Copy copy = new Copy();
-                            System.out.println("Copy test runlog");
-                            copy.copyFileFromPod(namespace, testPodName, testPodName,"/root/testlog.tar.gz", Paths.get("testlog.tar.gz"));
-                            copy.copyFileFromPod(namespace, testPodName, testPodName,"/root/testlog.txt", Paths.get("testlog.txt"));
-                            copy.copyDirectoryFromPod(namespace, testPodName, testPodName, "/root/testlog.tar.gz", path, true);
-                            System.out.println("Copy test reports");
-                            copy.copyDirectoryFromPod(namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), path, true);
-                        }
+
+                    Path filePath = Paths.get("testlog.txt");
+                    if (!Files.exists(filePath)) {
+                        Files.createFile(filePath);
                     }
+                    downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
+
+                    Path dirPath = Paths.get("test_report");
+                    if (!Files.exists(dirPath)) {
+                        Files.createDirectory(dirPath);
+                    }
+                    downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
                 }
             }
         }
 
-        System.out.println(podStatus);
+        System.out.println("Test status: " + podStatus);
         return !"Failed".equals(podStatus);
     }
+
+    public void downloadFile(String config, String namespace, String podName, String containerName, String srcPath, Path targetPath) {
+        try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
+            client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).file(srcPath).copy(targetPath);
+            System.out.printf("File(%s) copied successfully!%n", srcPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.printf("Fail to get %s!%n", srcPath);
+        }
+    }
+
+    public void downloadDir(String config, String namespace, String podName, String containerName, String srcPath, Path tarPath) {
+        try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
+            client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).dir(srcPath).copy(tarPath);
+            System.out.printf("Directory(%s) copied successfully!%n", srcPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.printf("Fail to get %s!%n", srcPath);
+        }
+    }
+
 }

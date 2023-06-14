@@ -23,66 +23,70 @@ import okhttp3.Response;
 import org.apache.process.api.AppActions;
 import org.apache.process.api.AuthAction;
 import org.apache.process.api.EnvActions;
+import org.apache.process.config.Configs;
 import org.apache.process.model.Deploymodel;
 import org.apache.process.utils.PrintInfo;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 
 public class Deploy {
-    public boolean startDeploy(String appName, String alias, String description, String repoName, String chartPath, String chartBranch, String chartGit, String projectName, String env, String helmValues) throws  InterruptedException {
+    public boolean startDeploy(HashMap<String, Object> paramsMap) throws  InterruptedException {
         System.out.println("************************************");
-        System.out.println("*     Create env and deploy...     *");
+        System.out.println("*     Create namespace and deploy...     *");
         System.out.println("************************************");
 
         AuthAction authAction = new AuthAction();
         authAction.setToken("login");
         TimeUnit.SECONDS.sleep(1);
 
-        System.out.printf("Generate env(%s) and env namespace(%s)%n", env, env);
+        String namespace = paramsMap.get("namespace").toString();
+
+        System.out.printf("Generate namespace(%s) and namespace namespace(%s)%n", namespace, namespace);
         try{
             EnvActions envActions = new EnvActions();
-            String envBodyContent = String.format(Deploymodel.ENV_BODY, env, env, projectName, env);
+            String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
             Response response = envActions.createenv(envBodyContent);
-            PrintInfo.printRocketInfo(response, String.format("Generate env(%s) success!", env));
+            PrintInfo.printRocketInfo(response, String.format("Generate namespace(%s) success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
 
-        System.out.printf("Generate %s Application%n", appName);
+        System.out.printf("Generate %s Application%n", namespace);
         AppActions appActions = new AppActions();
         try{
             authAction.setToken("refresh_token");
-            String componentProperty = Deploymodel.generateComponentProperties(helmValues, chartPath, chartBranch, chartGit);
-            String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, appName, projectName, description, alias, env, repoName, componentProperty);
+            String componentProperty = paramsMap.get("helm").toString();
+            String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, namespace, Configs.PROJECT_NAME, paramsMap.get("velaAppDescription"), namespace, namespace, paramsMap.get("repoName"), componentProperty);
             Response createAppResponse = appActions.createApplication(bodyContent);
-            PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", appName)));
+            PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", namespace)));
         }catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
 
-        System.out.printf("deploy %s Application%n", appName);
+        System.out.printf("deploy %s Application%n", namespace);
         try{
-            String workflowName = "workflow-"+appName;
+            String workflowName = "workflow-"+namespace;
             String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
             authAction.setToken("refresh_token");
-            Response response = appActions.deployOrUpgradeApplication(appName, deployBodyContent);
-            PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", appName));
+            Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);
+            PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
             System.exit(1);
         }
 
-        System.out.printf("Query %s Application status%n",appName);
+        System.out.printf("Query %s Application status%n",namespace);
 
-        int querryTime = 120;
+        int querryTime = Integer.parseInt(paramsMap.get("waitTimes").toString()) / 5;
             try{
                 while(querryTime>0) {
                     authAction.setToken("refresh_token");
-                    Response response = appActions.getApplicationStatus(appName, env);
+                    Response response = appActions.getApplicationStatus(namespace, namespace);
                     JSONObject json;
                     if (response.body() != null) {
                         json = new JSONObject(response.body().string());
@@ -101,7 +105,7 @@ public class Deploy {
                     } else if ("executing".equals(workflowsStatus)) {
                         System.out.println("waiting...");
                         System.out.println("message: " + message);
-                        querryTime++;
+                        querryTime--;
                         TimeUnit.SECONDS.sleep(5);
                     } else {
                         System.out.println(message);
