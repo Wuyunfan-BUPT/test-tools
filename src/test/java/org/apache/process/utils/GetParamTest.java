@@ -84,11 +84,13 @@ public class GetParamTest {
                         "service:\n" +
                         "  nodePort: 30009\n" +
                         "  type: ClusterIP";
-        String params = "username: nacos\n" +
-                "password: nacos\n" +
-                "cmd: mvn -B install\n"+
+        String params = "action: deploy\n" +
+                "namespace: nacos-12345562-2331\n" +
+                "velaUsername: nacos\n" +
+                "velaPassword: abc12345\n"+
+                "askConfig: ${{ secrets.ASK_CONFIG_VIRGINA }}\n"  +
                 "helm:\n" +
-                "  chart: java/e2e\n"+
+                "  chart: ./helm\n"+
                 "  git:\n"+
                 "    branch: master\n"+
                 "  repoType: git\n"+
@@ -114,9 +116,12 @@ public class GetParamTest {
                 "      type: ClusterIP";
         String target = "helm";
         HashMap<String, Object> paramsMap =  parseDeployInput(params, target);
-        Assert.assertEquals(paramsMap.get("username"), "nacos");
-        Assert.assertEquals(paramsMap.get("password"), "nacos");
-        Assert.assertEquals(paramsMap.get("cmd"), "mvn -B install");
-        Assert.assertEquals(Deploymodel.generateComponentProperties(helmvalues,"java/e2e","master", "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git").length(), paramsMap.get("helm").toString().length());
+        Assert.assertEquals(paramsMap.get("action"), "deploy");
+        Assert.assertEquals(paramsMap.get("namespace"), "nacos-12345562-2331");
+        Assert.assertEquals(paramsMap.get("velaUsername"), "nacos");
+        Assert.assertEquals(paramsMap.get("velaPassword"), "abc12345");
+        Assert.assertEquals(paramsMap.get("askConfig"), "${{ secrets.ASK_CONFIG_VIRGINA }}");
+
+        Assert.assertEquals(Deploymodel.generateComponentProperties(helmvalues,"./helm","master", "https://ghproxy.com/https://github.com/apache/rocketmq-e2e.git").length(), paramsMap.get("helm").toString().length());
     }
 }
