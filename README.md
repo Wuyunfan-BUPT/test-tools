@@ -1,46 +1,100 @@
 # test-tools
-This project is used for repository testing, including deployment, testing, cleaning and other processes, currently supports rocketmq and nacos.
+This project is used for repository testing, including deployment, testing, cleaning.
 ## Preparation
-- ASK cluster: a cluster to run code
-- install kubevela in cluster
+- ASK cluster: a cluster to run code.
+- install kubevela in ask cluster.
+## params
+you should input a yaml format string.
+Attention: 
+- askConfig must be encoder by base64.
+- If some of the parameters are not included, set it to null.
+- you can add or delete params in "helm" and "ENV" segment .
+##### example
+###### deploy
+```agsl
+yamlString: 
+  action: deploy
+  namespace: rocketmq-457628-0
+  askConfig: ***********
+  waitTimes: 1200
+  velaAppDescription: rocketmq-push-ci-0@abcdefg
+  repoName: rocketmq
+  velauxUsername: admin
+  velauxPassword: velaux12345
+  helm:
+    chart: ./rocketmq-k8s-helm
+    git:
+    branch: master
+    repoType: git
+    retries: 3
+    url: https://ghproxy.com/https://github.com/apache/rocketmq-docker.git
+    values:
+      nameserver:
+        image:
+        repository: wuyfeedocker/rocketm-ci
+        tag: develop-3b416669-cab7-41b4-8cc8-4af851944de2-ubuntu
+      broker:
+        image:
+        repository: wuyfeedocker/rocketm-ci
+        tag: develop-3b416669-cab7-41b4-8cc8-4af851944de2-ubuntu
+      proxy:
+        image:
+        repository: wuyfeedocker/rocketm-ci
+        tag: develop-3b416669-cab7-41b4-8cc8-4af851944de2-ubuntu
+```
+
+###### test
+```agsl
+yamlString: |
+  action: test
+  namespace: rocketmq-457628-0
+  askConfig: ***********
+  API_VERSION: v1
+  KIND: Pod
+  RESTART_POLICY: Never
+  ENV:
+    CODE: https://ghproxy.com/https://github.com/apache/rocketmq-e2e
+    BRANCH: master
+    CODE_PATH: java/e2e-v4
+    CMD: mvn -B test
+    ALL_IP: null
+  CONTAINER:
+    IMAGE: cloudnativeofalibabacloud/test-runner:v0.0.3
+    RESOURCE_LIMITS:
+      cpu: 8
+      memory: 8Gi
+    RESOURCE_REQUIRE:
+      cpu: 8
+      memory: 8Gi
+```
+###### clean
+```agsl
+yamlString: |
+  action: clean
+  namespace: rocketmq-457628-0
+  askConfig: ***********
+  velauxUsername: admin
+  velauxPassword: velaux12345
+```
+
 
 ## Usage
-|     params     | required |             mean              |     values      |                                                                                default                                                                                 |
-|:--------------:|  :----:  |:-----------------------------:|:---------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|    testRepo    | true |        test Resonsity         | nacos, rocketmq |                                                                                  null                                                                                  |
-|     action     | false |    run in local / cluster     | local / cluster |                                                       cluster(not support this param currently， retain keyword)                                                        |
-|    version     | false |         mark workflow         |     string      |                                                                                  null                                                                                  |
-|    jobIndex    | false |       github job index        |     number      |                                                                                   0                                                                                    |
-|   askConfig    | true |      ask cluster config       |     string      |                                                                                  null                                                                                  |
-| velauxUserName | true |        velaUX username        |     string      |                                                                                  null                                                                                  |
-| velauxPassword | true |        velaUX password        |     string      |                                                                                                                         null                                           |
-|    chartGit    | false |     helm chart repository     |       url       |                                                                                   rocketmq: https://ghproxy.com/https://github.com/apache/rocketmq-docker.git <br/> nacos: https://ghproxy.com/https://github.com/Wuyunfan-BUPT/nacos-docker.git |
-|   chartPath    | false | helm chart path in repository |      path       |                                                                                                                                        rocketmq: ./rocketmq-k8s-helm <br/> nacos: ./helm                                                        |
-|  chartBranch   | false |       helm chart branch       |     branch      |                                                                                                                                                               master                                                                             |
-|   helmValue    | true |       helm chart values       |   yaml struct   |                                                                                                                                                               ...                                                                               |
-|  testCodeGit   | false |     test code repository      |       url       |                                                                                                         rocketmq: https://github.com/apache/rocketmq-e2e.git <br/> nacos:  https://github.com/nacos-group/nacos-e2e.git                         |
-|  testCodePath  | false | test code path in repository  |      path       |                                                                                                                                          rocketmq: java/e2e <br/> nacos:  java/nacos-2X                                                         |
-|  testCmdBase   | false |   execute test code command   |     command     |                                                                                                                                       rocketmq: mvn -B test <br/> nacos:   mvn clean test -B                                                     |
 
 ## start project
 ### by java jar
 ```agsl
 cd test-tools
-mvn clean install
-mv /target/rocketmq-test-tools-1.0-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar
+mvn clean install -Dmaven.test.skip=true
+mv /target/rocketmq-test-tools-*-SNAPSHOT-jar-*.jar ./rocketmq-test-tools.jar
 # quick start run
-jar -jar rocketmq-test-tools.jar -testRepo=nacos -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} 
-# or
-jar -jar rocketmq-test-tools.jar -testRepo=nacos -version=123456 -jobIndex=1 -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} -chartGit=https://ghproxy.com/https://github.com/Wuyunfan-BUPT/nacos-docker.git -chartPath=./helm chartBranch=master helmValue=${your helmValue} -testCodeGit=https://github.com/nacos-group/nacos-e2e.git -testCodePath=java/nacos-2X -testCmdBase="mvn clean test -B" 
+jar -jar rocketmq-test-tools.jar -yamlString=${your yamlString}
 ```
 ### by docker images
 ```
 # build docker images
 docker build -t test-tools
 # quick start run
-docker run -it test-tools -testRepo=nacos -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} 
-# or
-docker run -it test-tools -testRepo=nacos -version=123456 -jobIndex=1 -askConfig=${your ask config}  -velauxUsername=${your velaux username}  -velauxPassword=${your velaux password} -chartGit=https://ghproxy.com/https://github.com/Wuyunfan-BUPT/nacos-docker.git -chartPath=./helm chartBranch=master helmValue=${your helmValue} -testCodeGit=https://github.com/nacos-group/nacos-e2e.git -testCodePath=java/nacos-2X -testCmdBase="mvn clean test -B" 
+docker run -it test-tools -yamlString=${your yamlString}
 ```
 ### deploy in github action
 Attention: if you use this resposity dockerfile, make sure all params input and are in order. Example follow：
