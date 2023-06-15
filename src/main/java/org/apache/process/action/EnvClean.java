@@ -48,7 +48,7 @@ public class EnvClean {
             AppActions appActions = new AppActions();
             appActions.deleteOAM(namespace, namespace).close();
             boolean isDeletedsuccessed = false;
-            int times = 10;
+            int times = 5;
             while(!isDeletedsuccessed && times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(appActions.deleteApplication(namespace));
                 TimeUnit.SECONDS.sleep(3);
@@ -58,7 +58,7 @@ public class EnvClean {
             System.out.printf("vela application:%s delete success!%n", namespace);
             EnvActions envActions = new EnvActions();
             isDeletedsuccessed = false;
-            times = 10;
+            times = 5;
             while(!isDeletedsuccessed && times>0){
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(envActions.deleteEnv(namespace));
                 TimeUnit.SECONDS.sleep(3);
