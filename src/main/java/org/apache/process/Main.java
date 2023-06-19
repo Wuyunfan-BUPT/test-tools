@@ -62,7 +62,7 @@ public class Main {
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
 
-            String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString().replace("\\n", ""));
+            String askConfig = Decoder.base64Decoder(inputMap.getOrDefault("askConfig", "").toString().replace("\\n", ""));
             if (inputMap.getOrDefault("velauxUsername", null) != null) {
                 Configs.VELAUX_USERNAME = inputMap.get("velauxUsername").toString();
             }
