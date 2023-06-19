@@ -52,7 +52,7 @@ public class Deploy {
             PrintInfo.printRocketInfo(response, String.format("Generate namespace(%s) success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
+            return false;
         }
 
         System.out.printf("Generate %s Application%n", namespace);
@@ -65,7 +65,7 @@ public class Deploy {
             PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", namespace)));
         }catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
+            return false;
         }
 
         System.out.printf("deploy %s Application%n", namespace);
@@ -77,7 +77,7 @@ public class Deploy {
             PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
-            System.exit(1);
+            return false;
         }
 
         System.out.printf("Query %s Application status%n",namespace);
@@ -114,6 +114,7 @@ public class Deploy {
                 }
             }catch (Exception e) {
                 e.printStackTrace();
+                return false;
             }
             return true;
     }
