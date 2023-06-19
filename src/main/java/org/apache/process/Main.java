@@ -23,6 +23,7 @@ import org.apache.process.action.Deploy;
 import org.apache.process.action.PortForward;
 import org.apache.process.action.EnvClean;
 import org.apache.process.action.RepoTest;
+import org.apache.process.report_utils.GenerateReport;
 import org.apache.process.utils.Decoder;
 import org.apache.commons.cli.*;
 import org.apache.process.config.Configs;
@@ -81,6 +82,9 @@ public class Main {
             } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
                 isSuccessed = new RepoTest().runTest(inputMap);
+            } else if("report".equals(action)){
+                GenerateReport generateReport = new GenerateReport();
+                generateReport.generateReportMarkDown(inputMap);
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
