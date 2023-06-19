@@ -62,7 +62,13 @@ public class Main {
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
 
-            String askConfig = Decoder.base64Decoder(inputMap.getOrDefault("askConfig", "").toString().replace("\\n", ""));
+            if("report".equals(action)){
+                GenerateReport generateReport = new GenerateReport();
+                generateReport.generateReportMarkDown(inputMap);
+                System.exit(0);
+            }
+
+            String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString().replace("\\n", ""));
             if (inputMap.getOrDefault("velauxUsername", null) != null) {
                 Configs.VELAUX_USERNAME = inputMap.get("velauxUsername").toString();
             }
@@ -82,9 +88,6 @@ public class Main {
             } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
                 isSuccessed = new RepoTest().runTest(inputMap);
-            } else if("report".equals(action)){
-                GenerateReport generateReport = new GenerateReport();
-                generateReport.generateReportMarkDown(inputMap);
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
