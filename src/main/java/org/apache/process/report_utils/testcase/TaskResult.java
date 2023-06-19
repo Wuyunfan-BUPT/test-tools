@@ -132,7 +132,7 @@ public class TaskResult {
         for (CaseResult successCase : successCaseMap.values()) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
             linkBuilder.setLink(successCase.getClassName() + "." + successCase.getMethodName(),
-                    repoUrl);
+                    repoUrl+"/"+successCase.getClassName().replace(".", "/") +".java");
 
             builder.addHeader("Name: " + linkBuilder.build() +
                     " Time: " + successCase.getTime() + "s", 4);
@@ -142,7 +142,7 @@ public class TaskResult {
         for (CaseResult skippedCase : skipCaseMap.values()) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
             linkBuilder.setLink(skippedCase.getClassName() + "." + skippedCase.getMethodName(),
-                    repoUrl);
+                    repoUrl+"/"+skippedCase.getClassName().replace(".", "/") +".java");
 
             builder.addHeader("Name: " + linkBuilder.build() +
                     " Time: " + skippedCase.getTime() + "s", 4);
