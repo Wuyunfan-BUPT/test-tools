@@ -23,10 +23,11 @@ public class GenerateReport {
         });
         for (String s : files) {
             fileList.add(new File(xmlPath + "/" + s));
+            System.out.println(s);
         }
         xUnitTestResultParser parser = new xUnitTestResultParser();
         TaskResult res = parser.parseTestResult(fileList);
-        File f=new File("./result.md");//新建一个文件对象，如果不存在则创建一个该文件
+        File f=new File("result.md");//新建一个文件对象，如果不存在则创建一个该文件
         FileWriter fw;
         try {
             fw=new FileWriter(f);
