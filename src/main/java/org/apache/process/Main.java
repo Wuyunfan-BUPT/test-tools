@@ -90,6 +90,7 @@ public class Main {
                 isSuccessed = new RepoTest().runTest(inputMap);
                 GenerateReport generateReport = new GenerateReport();
                 generateReport.generateReportMarkDown(inputMap);
+                System.out.println("upload report success!");
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {

@@ -34,6 +34,7 @@ public class GenerateReport {
             String str=res.toMarkdown(repoUrl);
             fw.write(str);
             fw.close();
+            System.out.println("upload report success!");
         } catch (IOException e) {
             System.out.println("write error!");
             e.printStackTrace();
