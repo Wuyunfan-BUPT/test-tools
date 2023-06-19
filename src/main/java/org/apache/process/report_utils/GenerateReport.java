@@ -35,6 +35,7 @@ public class GenerateReport {
             fw.write(str);
             fw.close();
         } catch (IOException e) {
+            System.out.println("write error!");
             e.printStackTrace();
             return false;
         }
