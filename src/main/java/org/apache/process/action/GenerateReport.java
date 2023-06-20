@@ -1,4 +1,4 @@
-package org.apache.process.report_utils;
+package org.apache.process.action;
 
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
@@ -11,20 +11,33 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class GenerateReport {
+    /**
+     * genarate markdown by test xml report.
+     * @param inputMap params map.
+     * @return boolean.
+     */
     public boolean generateReportMarkDown(LinkedHashMap<String, Object> inputMap) {
         LinkedHashMap<String, Object> envMap = (LinkedHashMap)inputMap.get("ENV");
-        String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString()+"/src/test/java";
+        // set test code url
+        //String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString()+"/src/test/java";
+        String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString();
+        // test-report path
         String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
         List<File> fileList = new ArrayList<>();
-        File file = new File(xmlPath);
-        String[] files = file.list((dir, name) -> {
-            // TODO Auto-generated method stub
+        File filePath = new File(xmlPath);
+        // filter .xml files
+        String[] files = filePath.list((dir, name) -> {
             return name.endsWith(".xml");
         });
-        for (String s : files) {
-            fileList.add(new File(xmlPath + "/" + s));
-            System.out.println(s);
+        if (files != null) {
+            for (String file : files) {
+                fileList.add(new File(xmlPath + "/" + file));
+            }
+        }else{
+            System.out.println("xml files unfounded!");
+            return false;
         }
+        // parse test files.
         xUnitTestResultParser parser = new xUnitTestResultParser();
         TaskResult res = parser.parseTestResult(fileList);
         File f=new File("result.md");
@@ -35,14 +48,19 @@ public class GenerateReport {
             fw.write(str);
             fw.close();
             System.out.println("Generate report success!");
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Fail to generate report!");
             return false;
         }
-        return true;
     }
 
+    /**
+     * if test code url contains proxy address, remove it.
+     * @param url test code url
+     * @return test code url which hasn't proxy address.
+     */
     public String splitHttps(String url){
         String[] httpUrl = url.split("https://");
         if(httpUrl.length == 1) {
