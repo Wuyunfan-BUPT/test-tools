@@ -2,10 +2,8 @@ package org.apache.process.report_utils;
 
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
-
 import java.io.File;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,17 +25,17 @@ public class GenerateReport {
         }
         xUnitTestResultParser parser = new xUnitTestResultParser();
         TaskResult res = parser.parseTestResult(fileList);
-        File f=new File("result.md");//新建一个文件对象，如果不存在则创建一个该文件
+        File f=new File("result.md");
         FileWriter fw;
         try {
             fw=new FileWriter(f);
             String str=res.toMarkdown(repoUrl);
             fw.write(str);
             fw.close();
-            System.out.println("upload report success!");
+            System.out.println("Generate report success!");
         } catch (IOException e) {
-            System.out.println("write error!");
             e.printStackTrace();
+            System.out.println("Fail to generate report!");
             return false;
         }
         return true;
