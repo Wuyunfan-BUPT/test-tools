@@ -38,7 +38,7 @@ public class xUnitTestResultParser implements TestResultParser {
 
 
     /**
-     * 根据生成的测试文件，解析测试结果
+     * parse the test result by test file.
      */
     @Override
     public TaskResult parseTestResult(List<File> files) {
@@ -53,10 +53,10 @@ public class xUnitTestResultParser implements TestResultParser {
         }
 
         for (File file : files) {
-            //由于junit5对错误重试的case会覆盖Report报告，所以根据文件md5进行判断
+            // since the case of junit5 retrying the error will cover the report, it is judged according to the file md5.
             String fileMd5 = FileUtils.getFileMd5(file);
             if (StringUtils.isNotBlank(fileMd5) && !parsedFiles.contains(fileMd5)) {
-                //判断该文件是否已经结束，被解析
+                // determine whether the file has ended, and parse it if it has ended.
                 if (StringUtils.contains(getLastLineFromFile(file.getAbsolutePath()), "</testsuites>") ||
                         StringUtils.contains(getLastLineFromFile(file.getAbsolutePath()), "</testsuite>")) {
                     parsedFiles.add(fileMd5);
@@ -79,7 +79,7 @@ public class xUnitTestResultParser implements TestResultParser {
         }
     }
 
-    // 解析一个文件
+    // parse a file.
     private void parseFileResult(File file, TaskResult taskResult) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -99,7 +99,7 @@ public class xUnitTestResultParser implements TestResultParser {
         }
     }
 
-    //解析测试类
+    // parse test class.
     private void parseTestClass(Element testSuiteElement, TaskResult taskResult) {
         if (testSuiteElement.hasAttribute("time")) {
             taskResult.addCostTime(Double.parseDouble(testSuiteElement.getAttribute("time").replace(",", "").trim()));
