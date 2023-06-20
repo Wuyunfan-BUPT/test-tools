@@ -2,6 +2,7 @@ package org.apache.process.report_utils;
 
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -11,8 +12,9 @@ import java.util.List;
 
 public class GenerateReport {
     public boolean generateReportMarkDown(LinkedHashMap<String, Object> inputMap) {
-        String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", inputMap.get("CODE_PATH").toString());
-        String repoUrl = inputMap.get("REPO_URL").toString();
+        LinkedHashMap<String, Object> envMap = (LinkedHashMap)inputMap.get("ENV");
+        String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString()+"/src/test/java";
+        String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
         List<File> fileList = new ArrayList<>();
         File file = new File(xmlPath);
         String[] files = file.list((dir, name) -> {
@@ -39,5 +41,14 @@ public class GenerateReport {
             return false;
         }
         return true;
+    }
+
+    public String splitHttps(String url){
+        String[] httpUrl = url.split("https://");
+        if(httpUrl.length == 1) {
+            return httpUrl[0];
+        } else{
+            return "https://" +httpUrl[httpUrl.length-1];
+        }
     }
 }
