@@ -13,13 +13,14 @@ import java.util.regex.Pattern;
  * Created by wangtong.wt on 2017/3/20.
  *
  * @author wangtong.wt
+ * @author wuyfee.
  * @date 2017/03/20
  */
 @Data
 public class TaskResult {
 
     /**
-     * 用例执行时间
+     * case run time.
      */
     protected double costTime;
 
@@ -88,6 +89,16 @@ public class TaskResult {
         }
     }
 
+    /**
+     *
+     * @param repoName repository name.
+     * @param repoBaseUrl test-code base url.
+     * @param gitBranch repository beanch.
+     * @param codePath test-code poth in repository.
+     * @param githubToken github access token.
+     * @return markdown content.
+     * @throws IOException exception.
+     */
     public String toMarkdown(String repoName, String repoBaseUrl, String gitBranch, String codePath, String githubToken) throws IOException {
         MarkdownBuilder builder = MarkdownBuilder.builder();
         builder.addHeader("Test Cases Info", 2);
@@ -105,7 +116,7 @@ public class TaskResult {
         String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath; // apache/rocketmq-e2e/contents/golang";
         // get all files and their url in repository.
         getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken ,fileInfoMap);
-
+        builder.addHeader("--------------------------------", 3);
         builder.addHeader(":x: Failed Case Detail", 3);
 
         List<CaseResult> allBadCase = new ArrayList<>(failureCaseMap.values());
@@ -134,37 +145,12 @@ public class TaskResult {
 
             builder.addCollapse("Exception Detail", exceptionBuilder.build());
         }
+        if(allBadCase.size()==0){
+            builder.addHeader("All case Pass! ", 4);
+        }
 
-        builder.addHeader(":white_check_mark: Success Cases", 3);
-        writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap);
-//        for (CaseResult successCase : successCaseMap.values()) {
-//            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
-//            String caseUrl = repoBaseUrl;
-//            if(fileInfoMap.containsKey(getClassName(successCase.getClassName()))){
-//                caseUrl = fileInfoMap.get(getClassName(successCase.getClassName())).getFileUrl();
-//            }
-//            System.out.println(caseUrl);
-//            linkBuilder.setLink(successCase.getClassName() + "." + successCase.getMethodName(),
-//                    caseUrl);
-//
-//            builder.addHeader("Name: " + linkBuilder.build() +
-//                    " Time: " + successCase.getTime() + "s", 4);
-//        }
-
-        builder.addHeader(":next_track_button: Skipped Cases", 3);
-        writeContentToMarkdown(repoBaseUrl, builder, skipCaseMap, fileInfoMap);
-//        for (CaseResult skippedCase : skipCaseMap.values()) {
-//            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
-//            String caseUrl = repoBaseUrl;
-//            if(fileInfoMap.containsKey(getClassName(skippedCase.getClassName()))){
-//                caseUrl = fileInfoMap.get(getClassName(skippedCase.getClassName())).getFileUrl();
-//            }
-//            System.out.println(caseUrl);
-//            linkBuilder.setLink(skippedCase.getClassName() + "." + skippedCase.getMethodName(), caseUrl);
-//            builder.addHeader("Name: " + linkBuilder.build() +
-//                    " Time: " + skippedCase.getTime() + "s", 4);
-//        }
-
+        writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap, ":white_check_mark: Success Cases", 3);
+        writeContentToMarkdown(repoBaseUrl, builder, skipCaseMap, fileInfoMap, ":next_track_button: Skipped Cases", 3);
         return builder.build();
     }
 
@@ -220,7 +206,9 @@ public class TaskResult {
      * @param caseMap case result map.
      * @param fileInfoMap repository file map.
      */
-    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap){
+    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level){
+        builder.addHeader("--------------------------------", level);
+        builder.addHeader(title, level);
         MarkdownBuilder contextBuilder = MarkdownBuilder.builder();
         //exceptionBuilder.newLine();
         contextBuilder.newLine();
@@ -234,8 +222,6 @@ public class TaskResult {
             linkBuilder.setLink(caseResult.getClassName() + "." + caseResult.getMethodName(),
                     caseUrl);
 
-//            builder.addHeader("Name: " + linkBuilder.build() +
-//                    " Time: " + caseResult.getTime() + "s", 4);
             contextBuilder.addBoldText("Name: " + linkBuilder.build() + " Time: " + caseResult.getTime() + "s").newLine();
             contextBuilder.newLine();
         }
