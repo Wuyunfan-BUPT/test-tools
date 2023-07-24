@@ -2,6 +2,7 @@ package org.apache.process.action;
 
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
+import org.apache.process.utils.Decoder;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,11 +19,10 @@ public class GenerateReport {
      */
     public boolean generateReportMarkDown(LinkedHashMap<String, Object> inputMap) {
         LinkedHashMap<String, Object> envMap = (LinkedHashMap)inputMap.get("ENV");
-        // set test code url
-        //String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString()+"/src/test/java";
-        String repoUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString();
+        // set test code base url
+        String repoBaseUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString();
         // test-report path
-        String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
+        String xmlPath = String.format("test_report_nacos/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
         List<File> fileList = new ArrayList<>();
         File filePath = new File(xmlPath);
         // filter .xml files
@@ -44,7 +44,11 @@ public class GenerateReport {
         FileWriter fw;
         try {
             fw=new FileWriter(f);
-            String str=res.toMarkdown(repoUrl);
+            String githubToken = "";
+            if(envMap.containsKey("GITHUB_TOKEN")){
+                githubToken = "token " + Decoder.base64Decoder(envMap.get("GITHUB_TOKEN").toString().replace("\\n", ""));
+            }
+            String str=res.toMarkdown(envMap.get("REPO_NAME").toString(), repoBaseUrl, envMap.get("BRANCH").toString(), envMap.get("CODE_PATH").toString(), githubToken.replace("\n", ""));
             fw.write(str);
             fw.close();
             System.out.println("Generate report success!");

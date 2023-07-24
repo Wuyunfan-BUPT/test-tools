@@ -1,11 +1,10 @@
 package org.apache.process.report_utils.testcase;
 
-import org.apache.process.report_utils.MarkdownBuilder;
-import org.apache.process.report_utils.MarkdownLinkBuilder;
-import org.apache.process.report_utils.MarkdownTableBuilder;
+import org.apache.process.report_utils.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -89,17 +88,23 @@ public class TaskResult {
         }
     }
 
-    public String toMarkdown(String repoUrl) {
+    public String toMarkdown(String repoName, String repoBaseUrl, String gitBranch, String codePath, String githubToken) throws IOException {
         MarkdownBuilder builder = MarkdownBuilder.builder();
-
         builder.addHeader("Test Cases Info", 2);
-
         MarkdownTableBuilder tableBuilder = MarkdownTableBuilder.builder();
-        tableBuilder.addHead("Total", "Success", "Failure", "Error", "Skipped");
+
+        tableBuilder.addHead("Total", "Success✅", "Failure❌", "Error❌", "Skipped️↪️");
         tableBuilder.addRow(getTotalCount(), getSuccessCount(), getFailureCount(),
                 getErrorCount(), getSkipCount());
 
         builder.addTable(tableBuilder);
+
+        GetGithubRepoInfo getGithubRepoInfo = new GetGithubRepoInfo();
+        HashMap<String, RepoFileInfo> fileInfoMap = new HashMap<>();
+
+        String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath; // apache/rocketmq-e2e/contents/golang";
+        // get all files and their url in repository.
+        getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken ,fileInfoMap);
 
         builder.addHeader(":x: Failed Case Detail", 3);
 
@@ -109,11 +114,13 @@ public class TaskResult {
         for (CaseResult badCase : allBadCase) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
 
-            linkBuilder.setLink(badCase.getClassName() + "." + badCase.getMethodName(),
-                    repoUrl+"/"+badCase.getClassName().replace(".", "/") +".java#L"+getLineNumber(badCase.getDetailInfo()).split(":")[1]);
-            System.out.println(badCase.getDetailInfo());
-            System.out.println(getLineNumber(badCase.getDetailInfo()).split(":")[1]);
+            String caseUrl = getGithubRepoInfo.getCaseUrl(fileInfoMap, githubToken, getClassName(badCase.getClassName()), badCase.getMethodName(), repoName, gitBranch);
+            if(Objects.equals(caseUrl, "")) {
+                caseUrl = repoBaseUrl;
+            }
+            linkBuilder.setLink(badCase.getClassName() + "." + badCase.getMethodName(), caseUrl);
 
+            System.out.println(caseUrl);
 
             builder.addHeader("Name: " + linkBuilder.build() +
                     " Time: " + badCase.getTime() + "s", 4);
@@ -129,24 +136,34 @@ public class TaskResult {
         }
 
         builder.addHeader(":white_check_mark: Success Cases", 3);
-        for (CaseResult successCase : successCaseMap.values()) {
-            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
-            linkBuilder.setLink(successCase.getClassName() + "." + successCase.getMethodName(),
-                    repoUrl+"/"+successCase.getClassName().replace(".", "/") +".java");
-
-            builder.addHeader("Name: " + linkBuilder.build() +
-                    " Time: " + successCase.getTime() + "s", 4);
-        }
+        writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap);
+//        for (CaseResult successCase : successCaseMap.values()) {
+//            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
+//            String caseUrl = repoBaseUrl;
+//            if(fileInfoMap.containsKey(getClassName(successCase.getClassName()))){
+//                caseUrl = fileInfoMap.get(getClassName(successCase.getClassName())).getFileUrl();
+//            }
+//            System.out.println(caseUrl);
+//            linkBuilder.setLink(successCase.getClassName() + "." + successCase.getMethodName(),
+//                    caseUrl);
+//
+//            builder.addHeader("Name: " + linkBuilder.build() +
+//                    " Time: " + successCase.getTime() + "s", 4);
+//        }
 
         builder.addHeader(":next_track_button: Skipped Cases", 3);
-        for (CaseResult skippedCase : skipCaseMap.values()) {
-            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
-            linkBuilder.setLink(skippedCase.getClassName() + "." + skippedCase.getMethodName(),
-                    repoUrl+"/"+skippedCase.getClassName().replace(".", "/") +".java");
-
-            builder.addHeader("Name: " + linkBuilder.build() +
-                    " Time: " + skippedCase.getTime() + "s", 4);
-        }
+        writeContentToMarkdown(repoBaseUrl, builder, skipCaseMap, fileInfoMap);
+//        for (CaseResult skippedCase : skipCaseMap.values()) {
+//            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
+//            String caseUrl = repoBaseUrl;
+//            if(fileInfoMap.containsKey(getClassName(skippedCase.getClassName()))){
+//                caseUrl = fileInfoMap.get(getClassName(skippedCase.getClassName())).getFileUrl();
+//            }
+//            System.out.println(caseUrl);
+//            linkBuilder.setLink(skippedCase.getClassName() + "." + skippedCase.getMethodName(), caseUrl);
+//            builder.addHeader("Name: " + linkBuilder.build() +
+//                    " Time: " + skippedCase.getTime() + "s", 4);
+//        }
 
         return builder.build();
     }
@@ -170,6 +187,11 @@ public class TaskResult {
         return caseTypeMap.size();
     }
 
+    /**
+     * get function line of class by tag failure.
+     * @param str tag failure content.
+     * @return line number.
+     */
     public static String getLineNumber(String str){
         List<String> strList = new ArrayList<>();
         Pattern pattern = Pattern.compile("(?<=\\()[^\\)]+");
@@ -179,4 +201,46 @@ public class TaskResult {
         }
         return strList.get(0);
     }
+
+    /**
+     * get class name.
+     * @param name whole name, such as: com.alibaba.nacos.config.ConfigSyncTest.
+     * @return class name.
+     */
+    public String getClassName(String name){
+        String[] classNameArray = name.contains(".") ? name.split("\\.") : name.split("/");
+        return classNameArray[classNameArray.length-1];
+    }
+
+    /**
+     * write case content to markdown
+     *
+     * @param repoBaseUrl repository base url.
+     * @param builder Markdown builder.
+     * @param caseMap case result map.
+     * @param fileInfoMap repository file map.
+     */
+    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap){
+        MarkdownBuilder contextBuilder = MarkdownBuilder.builder();
+        //exceptionBuilder.newLine();
+        contextBuilder.newLine();
+        for (CaseResult caseResult : caseMap.values()) {
+            MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
+            String caseUrl = repoBaseUrl;
+            if(fileInfoMap.containsKey(getClassName(caseResult.getClassName()))){
+                caseUrl = fileInfoMap.get(getClassName(caseResult.getClassName())).getFileUrl();
+            }
+            System.out.println(caseUrl);
+            linkBuilder.setLink(caseResult.getClassName() + "." + caseResult.getMethodName(),
+                    caseUrl);
+
+//            builder.addHeader("Name: " + linkBuilder.build() +
+//                    " Time: " + caseResult.getTime() + "s", 4);
+            contextBuilder.addBoldText("Name: " + linkBuilder.build() + " Time: " + caseResult.getTime() + "s").newLine();
+            contextBuilder.newLine();
+        }
+        builder.addCollapse("Case Detail", contextBuilder.build());
+    }
+
+
 }
