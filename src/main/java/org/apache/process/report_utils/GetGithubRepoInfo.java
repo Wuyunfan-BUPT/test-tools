@@ -17,80 +17,80 @@ public class GetGithubRepoInfo {
     public GetGithubRepoInfo() {
         this.httpClient = new OkHttpClient();
     }
-
-    public String getRepoList(String owner, String repo, String path) {
-        String url = String.format("%s/%s/%s/contents/%s", API_BASE_URL, owner, repo, path);
-
-        Request request = new Request.Builder()
-                .url(url)
-                .header("Accept", "application/vnd.github.v3+json")
-                .build();
-
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-            return response.body().string();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public boolean checkUrl(String url){
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .build();
-
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                // 目录存在
-                System.out.println("Directory exists!");
-                return true;
-            } else if (response.code() == 404) {
-                // 目录不存在
-                System.out.println("Directory does not exist!");
-            } else {
-                // 其他错误
-                System.err.println("Error: " + response.code() + " " + response.message());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public String findFile(String url,String filename) {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                // 目录存在
-                System.out.println("Directory exists!");
-                //System.out.println(response.body().string());
-                JSONArray jsonArray = new JSONArray(response.body().string());
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    String name = jsonObject.getString("name");
-                    if (name.equals(filename)) {
-                        return filename;
-                    }
-                }
-            } else if (response.code() == 404) {
-                // 目录不存在
-                System.out.println("Directory does not exist!");
-            } else {
-                // 其他错误
-                System.err.println("Error: " + response.code() + " " + response.message());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return url;
-    }
+//
+//    public String getRepoList(String owner, String repo, String path) {
+//        String url = String.format("%s/%s/%s/contents/%s", API_BASE_URL, owner, repo, path);
+//
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .header("Accept", "application/vnd.github.v3+json")
+//                .build();
+//
+//        try (Response response = httpClient.newCall(request).execute()) {
+//            if (!response.isSuccessful()) {
+//                throw new IOException("Unexpected code " + response);
+//            }
+//            return response.body().string();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
+//
+//    public boolean checkUrl(String url){
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .get()
+//                .build();
+//
+//        try (Response response = client.newCall(request).execute()) {
+//            if (response.isSuccessful()) {
+//                // 目录存在
+//                System.out.println("Directory exists!");
+//                return true;
+//            } else if (response.code() == 404) {
+//                // 目录不存在
+//                System.out.println("Directory does not exist!");
+//            } else {
+//                // 其他错误
+//                System.err.println("Error: " + response.code() + " " + response.message());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+//
+//    public String findFile(String url,String filename) {
+//        OkHttpClient client = new OkHttpClient();
+//        Request request = new Request.Builder()
+//                .url(url)
+//                .build();
+//        try (Response response = client.newCall(request).execute()) {
+//            if (response.isSuccessful()) {
+//                // 目录存在
+//                System.out.println("Directory exists!");
+//                //System.out.println(response.body().string());
+//                JSONArray jsonArray = new JSONArray(response.body().string());
+//                for (int i = 0; i < jsonArray.length(); i++) {
+//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                    String name = jsonObject.getString("name");
+//                    if (name.equals(filename)) {
+//                        return filename;
+//                    }
+//                }
+//            } else if (response.code() == 404) {
+//                // 目录不存在
+//                System.out.println("Directory does not exist!");
+//            } else {
+//                // 其他错误
+//                System.err.println("Error: " + response.code() + " " + response.message());
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return url;
+//    }
 
     /**
      * find all files in current path.
@@ -178,19 +178,14 @@ public class GetGithubRepoInfo {
                 throw new IOException("Unexpected code " + response);
             }
             String responseBody = response.body().string();
-            //System.out.println(responseBody);
             JSONObject jsonObject = new JSONObject(responseBody);
             String s = jsonObject.getString("content");
-            //System.out.println(s);
             fileInfoMap.get(className).setContent(s.replace("\n", ""));
-            //contentMap.put(url, s.replace("\n", ""));
         }
         String content =  new String(Base64.getDecoder().decode(fileInfoMap.get(className).getContent()));
-        //System.out.println(content);
 
         String[] lines = content.split("\n");
         int result = 0;
-        //System.out.println(content);
 
         for (int i = 0; i < lines.length; i++) {
             if (lines[i].contains(keyword)) {
@@ -211,9 +206,8 @@ public class GetGithubRepoInfo {
      * @param repo username/repository.
      * @param branch repository branch.
      * @return complete url.
-     * @throws IOException
      */
-    public String getCaseUrl(HashMap<String, RepoFileInfo> fileInfoMap, String githubToken, String className, String functionName, String repo, String branch)throws IOException{
+    public String getCaseUrl(HashMap<String, RepoFileInfo> fileInfoMap, String githubToken, String className, String functionName, String repo, String branch) throws IOException{
         String url = "";
         int row = 0;
         if(fileInfoMap.containsKey(className)){

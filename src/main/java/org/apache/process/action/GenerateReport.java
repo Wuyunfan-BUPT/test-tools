@@ -19,13 +19,13 @@ public class GenerateReport {
      */
     public boolean generateReportMarkDown(LinkedHashMap<String, Object> inputMap) {
         LinkedHashMap<String, Object> envMap = (LinkedHashMap)inputMap.get("ENV");
-        // set test code base url
+        // set test code base url.
         String repoBaseUrl = splitHttps(envMap.get("CODE").toString())+"/tree/"+envMap.get("BRANCH").toString()+"/"+envMap.get("CODE_PATH").toString();
-        // test-report path
+        // test-report path.
         String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
         List<File> fileList = new ArrayList<>();
         File filePath = new File(xmlPath);
-        // filter .xml files
+        // filter .xml format files.
         String[] files = filePath.list((dir, name) -> {
             return name.endsWith(".xml");
         });

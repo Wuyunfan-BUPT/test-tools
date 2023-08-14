@@ -6,15 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by wangtong.wt on 2017/3/20.
  *
  * @author wangtong.wt
- * @author wuyfee.
  * @date 2017/03/20
+ * @author wuyfee.
+ * @date 2023/07/28
  */
 @Data
 public class TaskResult {
@@ -47,8 +46,8 @@ public class TaskResult {
             return;
         }
 
-        //判断历史运行的Case是否包含当前运行的Case
-        // 如果包含，则判断历史运行的Case是成功，还是失败，如果成功，则忽略，如果失败，则覆盖
+        // Determine whether the historically running Case includes the current running Case
+        // If it is included, judge whether the historical running Case is successful or failed. If it succeeds, ignore it. If it fails, it will overwrite it.
         if (caseTypeMap.containsKey(caseName)) {
             if (StringUtils.equals(caseTypeMap.get(caseName), CaseResult.CASE_RESULT_SUCCESS)) {
                 return;
@@ -95,7 +94,7 @@ public class TaskResult {
      * @param repoBaseUrl test-code base url.
      * @param gitBranch repository beanch.
      * @param codePath test-code poth in repository.
-     * @param githubToken github access token.
+     * @param githubToken GitHub access token.
      * @return markdown content.
      * @throws IOException exception.
      */
@@ -113,7 +112,7 @@ public class TaskResult {
         GetGithubRepoInfo getGithubRepoInfo = new GetGithubRepoInfo();
         HashMap<String, RepoFileInfo> fileInfoMap = new HashMap<>();
 
-        String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath; // apache/rocketmq-e2e/contents/golang";
+        String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath;
         // get all files and their url in repository.
         getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken ,fileInfoMap);
         builder.addHeader("--------------------------------", 3);
@@ -174,24 +173,9 @@ public class TaskResult {
     }
 
     /**
-     * get function line of class by tag failure.
-     * @param str tag failure content.
-     * @return line number.
-     */
-    public static String getLineNumber(String str){
-        List<String> strList = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(?<=\\()[^\\)]+");
-        Matcher matcher = pattern.matcher(str);
-        while(matcher.find()){
-            strList.add(matcher.group());
-        }
-        return strList.get(0);
-    }
-
-    /**
      * get class name.
      * @param name whole name, such as: com.alibaba.nacos.config.ConfigSyncTest.
-     * @return class name.
+     * @return class name. such as: ConfigSyncTest.
      */
     public String getClassName(String name){
         String[] classNameArray = name.contains(".") ? name.split("\\.") : name.split("/");
@@ -205,6 +189,8 @@ public class TaskResult {
      * @param builder Markdown builder.
      * @param caseMap case result map.
      * @param fileInfoMap repository file map.
+     * @param title section title.
+     * @param level font size level.
      */
     public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level){
         builder.addHeader("--------------------------------", level);
