@@ -103,7 +103,7 @@ public class TaskResult {
         builder.addHeader("Test Cases Info", 2);
         MarkdownTableBuilder tableBuilder = MarkdownTableBuilder.builder();
 
-        tableBuilder.addHead("Total", "Success✅", "Failure❌", "Error❌", "Skipped️↪️");
+        tableBuilder.addHead("Total", "Success✅", "Failure❌", "Error❎", "Skipped️↪️");
         tableBuilder.addRow(getTotalCount(), getSuccessCount(), getFailureCount(),
                 getErrorCount(), getSkipCount());
 
@@ -115,12 +115,17 @@ public class TaskResult {
         String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath;
         // get all files and their url in repository.
         getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken ,fileInfoMap);
-        builder.addHeader("--------------------------------", 3);
-        builder.addHeader(":x: Failed Case Detail", 3);
+        builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", 4);
+        builder.addHeader(":x: Failed/Error Case Detail", 3);
 
         List<CaseResult> allBadCase = new ArrayList<>(failureCaseMap.values());
         allBadCase.addAll(errorCaseMap.values());
 
+        if(allBadCase.size()>0){
+            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️️", 4);
+            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️ Some Case Fail/Error ! ⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
+            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
+        }
         for (CaseResult badCase : allBadCase) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
 
@@ -145,11 +150,14 @@ public class TaskResult {
             builder.addCollapse("Exception Detail", exceptionBuilder.build());
         }
         if(allBadCase.size()==0){
-            builder.addHeader("All case Pass! ", 4);
+            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
+            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉 All case Pass! 🎉🎉🎉🎉🎉🎉🎉🎉", 4);
+            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
         }
 
-        writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap, ":white_check_mark: Success Cases", 3);
-        writeContentToMarkdown(repoBaseUrl, builder, skipCaseMap, fileInfoMap, ":next_track_button: Skipped Cases", 3);
+        writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap, ":white_check_mark: Success Cases", 3, "✅");
+        writeContentToMarkdown(repoBaseUrl, builder, skipCaseMap, fileInfoMap, ":next_track_button: Skipped Cases", 3, "↪️");
+        builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", 4);
         return builder.build();
     }
 
@@ -191,13 +199,16 @@ public class TaskResult {
      * @param fileInfoMap repository file map.
      * @param title section title.
      * @param level font size level.
+     * @param logo logo.
      */
-    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level){
-        builder.addHeader("--------------------------------", level);
+    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level, String logo){
+        builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", level+1);
         builder.addHeader(title, level);
-        MarkdownBuilder contextBuilder = MarkdownBuilder.builder();
-        //exceptionBuilder.newLine();
-        contextBuilder.newLine();
+
+        MarkdownBuilder builder_tmp = MarkdownBuilder.builder();
+        MarkdownTableBuilder tableBuilder = MarkdownTableBuilder.builder();
+        tableBuilder.addHead("Test Name", "Result", "Time/s");
+
         for (CaseResult caseResult : caseMap.values()) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
             String caseUrl = repoBaseUrl;
@@ -207,11 +218,9 @@ public class TaskResult {
             System.out.println(caseUrl);
             linkBuilder.setLink(caseResult.getClassName() + "." + caseResult.getMethodName(),
                     caseUrl);
-
-            contextBuilder.addBoldText("Name: " + linkBuilder.build() + " Time: " + caseResult.getTime() + "s").newLine();
-            contextBuilder.newLine();
+            tableBuilder.addRow(linkBuilder.build(), logo+"pass", caseResult.getTime());
         }
-        builder.addCollapse("Case Detail", contextBuilder.build());
+        builder.addCollapse("🔎  Case Detail ", builder_tmp.addTable(tableBuilder).build());
     }
 
 

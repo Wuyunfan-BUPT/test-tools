@@ -44,7 +44,7 @@ public class Deploy {
 
         String namespace = paramsMap.get("namespace").toString();
 
-        System.out.printf("Generate namespace(%s) and namespace namespace(%s)%n", namespace, namespace);
+        System.out.printf("Generate namespace(%s) and namespace(%s)%n", namespace, namespace);
         try{
             EnvActions envActions = new EnvActions();
             String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
