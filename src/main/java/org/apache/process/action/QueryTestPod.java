@@ -30,6 +30,16 @@ import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 public class QueryTestPod {
+    /**
+     * get dictionary and file about test result from pod.
+     * @param config ask config.
+     * @param testPodName test pod name.
+     * @param namespace pod namespace.
+     * @param testCodePath test code path.
+     * @return boolean.
+     * @throws IOException io exception.
+     * @throws InterruptedException interrupt exception.
+     */
     public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath) throws IOException, InterruptedException {
         System.out.println("********************query status and get result********************");
         TimeUnit.SECONDS.sleep(3);
@@ -88,6 +98,15 @@ public class QueryTestPod {
         return !"Failed".equals(podStatus);
     }
 
+    /**
+     * download file from pod.
+     * @param config ask config.
+     * @param namespace pod namespace.
+     * @param podName pod name.
+     * @param containerName pod's container name.
+     * @param srcPath file path in pod.
+     * @param targetPath target file path.
+     */
     public void downloadFile(String config, String namespace, String podName, String containerName, String srcPath, Path targetPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).file(srcPath).copy(targetPath);
@@ -98,6 +117,15 @@ public class QueryTestPod {
         }
     }
 
+    /**
+     * download dictionary from pod.
+     * @param config ask config.
+     * @param namespace pod namespace.
+     * @param podName pod name.
+     * @param containerName pod's container name.
+     * @param srcPath dictionary path in pod
+     * @param tarPath target dictionary path.
+     */
     public void downloadDir(String config, String namespace, String podName, String containerName, String srcPath, Path tarPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).dir(srcPath).copy(tarPath);

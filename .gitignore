@@ -1,5 +1,6 @@
 target/
-test_report/
+result*.md
+test_report*
 testlog.txt
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

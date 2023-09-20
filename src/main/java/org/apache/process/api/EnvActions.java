@@ -44,7 +44,7 @@ public class EnvActions {
 
         return client.newCall(request).execute();
     }
-    public Response createenv(String bodyContent) throws IOException{
+    public Response createEnv(String bodyContent) throws IOException{
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
