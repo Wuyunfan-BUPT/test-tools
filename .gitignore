@@ -11,6 +11,7 @@ testlog.txt
 *.iws
 *.iml
 *.ipr
+src/test/*
 
 ### Eclipse ###
 .apt_generated
