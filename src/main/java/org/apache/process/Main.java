@@ -24,11 +24,10 @@ import org.apache.process.action.PortForward;
 import org.apache.process.action.EnvClean;
 import org.apache.process.action.RepoTest;
 import org.apache.process.action.GenerateReport;
-import org.apache.process.utils.Decoder;
 import org.apache.commons.cli.*;
 import org.apache.process.config.Configs;
 import org.apache.process.utils.GetParam;
-import org.apache.process.utils.SetConfig;
+import org.apache.process.utils.ConfigUtils;
 
 import java.util.*;
 
@@ -62,17 +61,20 @@ public class Main {
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
 
-            String askConfig = Decoder.base64Decoder(inputMap.get("askConfig").toString().replace("\\n", ""));
-            if (inputMap.getOrDefault("velauxUsername", null) != null) {
+
+            ConfigUtils configUtils = new ConfigUtils();
+            String askConfig = configUtils.base64Decoder(inputMap.get("askConfig").toString().replace("\\n", ""));
+            if (inputMap.getOrDefault("velauxUsername", null) != null && inputMap.getOrDefault("velauxPassword", null) != null) {
                 Configs.VELAUX_USERNAME = inputMap.get("velauxUsername").toString();
-            }
-            if (inputMap.getOrDefault("velauxPassword", null) != null) {
                 Configs.VELAUX_PASSWORD = inputMap.get("velauxPassword").toString();
+            }else{
+                String authentificationInfo[] =  configUtils.getAuthInfoFromConfig(askConfig).split(":");
+                Configs.VELAUX_USERNAME = authentificationInfo[0];
+                Configs.VELAUX_PASSWORD = authentificationInfo[1];
             }
 
-            SetConfig setConfig = new SetConfig();
-            String kubeConfigPath = setConfig.setConfig(askConfig);
-            setConfig.setKubeClientConfig(kubeConfigPath);
+            String kubeConfigPath = configUtils.setConfig(askConfig);
+            configUtils.setKubeClientConfig(kubeConfigPath);
             new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, askConfig);
 
             boolean isSuccessed = false;

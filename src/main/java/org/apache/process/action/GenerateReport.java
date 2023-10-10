@@ -2,7 +2,7 @@ package org.apache.process.action;
 
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
-import org.apache.process.utils.Decoder;
+import org.apache.process.utils.ConfigUtils;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -46,7 +46,7 @@ public class GenerateReport {
             fw=new FileWriter(f);
             String githubToken = "";
             if(envMap.containsKey("GITHUB_TOKEN")){
-                githubToken = "token " + Decoder.base64Decoder(envMap.get("GITHUB_TOKEN").toString().replace("\\n", ""));
+                githubToken = "token " + new ConfigUtils().base64Decoder(envMap.get("GITHUB_TOKEN").toString().replace("\\n", ""));
             }
             String str=res.toMarkdown(envMap.get("REPO_NAME").toString(), repoBaseUrl, envMap.get("BRANCH").toString(), envMap.get("CODE_PATH").toString(), githubToken.replace("\n", ""));
             fw.write(str);
