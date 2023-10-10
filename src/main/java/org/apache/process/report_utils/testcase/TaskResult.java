@@ -142,14 +142,14 @@ public class TaskResult {
 
             MarkdownBuilder exceptionBuilder = MarkdownBuilder.builder();
             exceptionBuilder.newLine();
-            exceptionBuilder.addBoldText("\\- Exception").newLine();
-            exceptionBuilder.addBoldText("```").newLine();
+            exceptionBuilder.addText("- Exception").newLine();
+            exceptionBuilder.addText("```").newLine();
             exceptionBuilder.addText(badCase.getDetailInfo()).newLine();
-            exceptionBuilder.addBoldText("```").newLine();
-            exceptionBuilder.addBoldText("\\- System out info").newLine();
-            exceptionBuilder.addBoldText("```").newLine();
+            exceptionBuilder.addText("```").newLine();
+            exceptionBuilder.addText("- System out info").newLine();
+            exceptionBuilder.addText("```").newLine();
             exceptionBuilder.addText(badCase.getSysoutLog()).newLine();
-            exceptionBuilder.addBoldText("```").newLine();
+            exceptionBuilder.addText("```").newLine();
 
             builder.addCollapse("Exception Detail", exceptionBuilder.build());
         }
