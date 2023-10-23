@@ -49,9 +49,22 @@ public class FabricPortForward {
                                                     inetAddress, localPort);
 
                         System.out.println("Checking forwarded port......");
-                       new OkHttpClient()
-                                .newCall(new Request.Builder().get().url("http://127.0.0.1:" + portForward.getLocalPort()).build()).execute()
-                                .body();
+                        int times = 5;
+                        boolean isForwarded = true;
+                        while(isForwarded && times>0){
+                            try{
+                                new OkHttpClient()
+                                        .newCall(new Request.Builder().get().url("http://127.0.0.1:" + portForward.getLocalPort()).build()).execute()
+                                        .body();
+                                System.out.println("check forwarded port success! ");
+                                isForwarded=false;
+                            }catch(IOException e){
+                                times--;
+                                System.out.println("check forwarded port fail! retry... ");
+                            };
+                        }
+
+
                         TimeUnit.MINUTES.sleep(Configs.MAX_RUN_TIME);
                         System.out.println("Closing forwarded port");
                         portForward.close();
