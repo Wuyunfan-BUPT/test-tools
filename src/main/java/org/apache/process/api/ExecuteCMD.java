@@ -5,7 +5,7 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
-//import lombok.SneakyThrows;
+import lombok.SneakyThrows;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.CompletableFuture;
@@ -19,12 +19,12 @@ public class ExecuteCMD implements AutoCloseable{
     public ExecuteCMD(String config) {
         this.client = new KubernetesClientBuilder().withConfig(config).build();
     }
- //   @SneakyThrows
+    @SneakyThrows
     public String execCommandOnPod(String podName, String namespace, String... cmd) throws ExecutionException, InterruptedException, TimeoutException {
         Pod pod = client.pods().inNamespace(namespace).withName(podName).get();
         CompletableFuture<String> data = new CompletableFuture<>();
         try (ExecWatch execWatch = execCmd(pod, data, cmd)) {
-            return data.get(10, TimeUnit.SECONDS);
+            return data.get(20, TimeUnit.SECONDS);
         }
 
     }
