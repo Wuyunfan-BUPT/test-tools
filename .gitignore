@@ -1,7 +1,7 @@
 target/
 result*.md
 test_report*
-testlog.txt
+nacos_nodejs_testlog.txt
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -30,6 +30,8 @@ testlog.txt
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
+src/test
+nacos*
 
 ### VS Code ###
 .vscode/
