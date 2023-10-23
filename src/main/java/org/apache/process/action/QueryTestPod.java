@@ -21,7 +21,6 @@ package org.apache.process.action;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import org.apache.process.api.ExecuteCMD;
 
 import java.io.*;
@@ -85,19 +84,6 @@ public class QueryTestPod {
                     e.printStackTrace();
                     System.out.println("query error! continue to query...");
                 }
-//                try{
-//                    String[] command = {"/bin/bash", "-c", "ls /root | grep testdone"};
-//                    ExecWatch watch = client.pods().inNamespace(namespace).withName(testPodName)
-//                            .inContainer(testPodName).redirectingInput().redirectingOutput()
-//                            .redirectingError().exec(command);
-//                    cmdOutput = watch.getOutput().toString();
-//                    System.out.println(cmdOutput);
-//                    watch.close();
-//
-//                }catch (Exception e) {
-//                    e.printStackTrace();
-//                    System.out.println("query error! continue to query...");
-//                }
 
                 // if the test program ends, get the result.
                 if (cmdOutput != null && cmdOutput.contains("testdone")) {
@@ -126,8 +112,6 @@ public class QueryTestPod {
                     while(isStop && downloaTimes>0) {
 
                             isStop = !downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
-                            //isStop = false;
-                            //System.out.println("download surefire-reports fail! retry...");
                             downloaTimes--;
                     }
                 }
