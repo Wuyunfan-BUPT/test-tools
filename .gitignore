@@ -30,7 +30,7 @@ nacos_nodejs_testlog.txt
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-src/test
+src/test/*
 nacos*
 
 ### VS Code ###
