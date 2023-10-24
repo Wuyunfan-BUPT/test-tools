@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 # Container image that runs your code
-FROM maven:latest
+FROM maven:3.8.5-jdk-8-slim
 
 MAINTAINER wuyfee "wyf_mohen@163.com"
 
