@@ -45,10 +45,10 @@ public class Deploy {
         String namespace = paramsMap.get("namespace").toString();
 
         System.out.printf("Generate namespace(%s) and namespace(%s)%n", namespace, namespace);
-        try{
-            EnvActions envActions = new EnvActions();
-            String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
-            Response response = envActions.createEnv(envBodyContent);
+
+        EnvActions envActions = new EnvActions();
+        String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
+        try(Response response = envActions.createEnv(envBodyContent);){
             PrintInfo.printRocketInfo(response, String.format("Generate namespace(%s) success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
@@ -57,11 +57,11 @@ public class Deploy {
 
         System.out.printf("Generate %s Application%n", namespace);
         AppActions appActions = new AppActions();
-        try{
-            authAction.setToken("refresh_token");
-            String componentProperty = paramsMap.get("helm").toString();
-            String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, namespace, Configs.PROJECT_NAME, paramsMap.get("velaAppDescription"), namespace, namespace, paramsMap.get("repoName"), componentProperty);
-            Response createAppResponse = appActions.createApplication(bodyContent);
+
+        authAction.setToken("refresh_token");
+        String componentProperty = paramsMap.get("helm").toString();
+        String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, namespace, Configs.PROJECT_NAME, paramsMap.get("velaAppDescription"), namespace, namespace, paramsMap.get("repoName"), componentProperty);
+        try(Response createAppResponse = appActions.createApplication(bodyContent)){
             PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", namespace)));
         }catch (Exception e){
             e.printStackTrace();
@@ -69,11 +69,11 @@ public class Deploy {
         }
 
         System.out.printf("deploy %s Application%n", namespace);
-        try{
-            String workflowName = "workflow-"+namespace;
-            String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
-            authAction.setToken("refresh_token");
-            Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);
+
+        String workflowName = "workflow-"+namespace;
+        String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
+        authAction.setToken("refresh_token");
+        try(Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);){
             PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", namespace));
         }catch (Exception e){
             e.printStackTrace();
@@ -83,10 +83,11 @@ public class Deploy {
         System.out.printf("Query %s Application status%n",namespace);
 
         int querryTime = Integer.parseInt(paramsMap.get("waitTimes").toString()) / 5;
+        Response response = null;
             try{
                 while(querryTime>0) {
                     authAction.setToken("refresh_token");
-                    Response response = appActions.getApplicationStatus(namespace, namespace);
+                    response = appActions.getApplicationStatus(namespace, namespace);
                     JSONObject json;
                     if (response.body() != null) {
                         json = new JSONObject(response.body().string());
@@ -113,6 +114,9 @@ public class Deploy {
                     }
                 }
             }catch (Exception e) {
+                if(response != null){
+                    response.close();
+                }
                 e.printStackTrace();
                 return false;
             }

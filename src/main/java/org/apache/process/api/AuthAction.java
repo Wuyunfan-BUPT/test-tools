@@ -55,10 +55,9 @@ public class AuthAction {
                     .addHeader("refreshToken", Configs.REFRESH_TOKEN)
                     .build();
         }
-        try{
-            Response response = client.newCall(request).execute();
+        try(Response response = client.newCall(request).execute();){
             JSONObject json = new JSONObject(response.body().string());
-            response.close();
+            //response.close();
             if(json.has("accessToken") && !Objects.equals(json.getString("accessToken"), "")){
                 Configs.TOKEN = json.getString("accessToken");
                 Configs.Authorization = "Bearer "+Configs.TOKEN;
