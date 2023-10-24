@@ -44,9 +44,9 @@ public class QueryTestPod {
         System.out.println("********************query status and get result********************");
         TimeUnit.SECONDS.sleep(3);
 
-        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
+        //KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
         String podStatus = null;
-        try{
+        try(KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()){
             podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
         }catch (Exception ignored) {
             System.out.println("podStatus set Pending..");
@@ -59,7 +59,7 @@ public class QueryTestPod {
         boolean isWaitingTest = true;
         while ("Pending".equals(podStatus) || "Running".equals(podStatus) || isWaitingTest) {
             TimeUnit.SECONDS.sleep(5);
-            try{
+            try(KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()){
                 podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
             }catch(Exception e){
                 System.out.println("Query pod fail! retry again...");
@@ -101,7 +101,6 @@ public class QueryTestPod {
                             isStop = !downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
                             downloaTimes--;
                     }
-
 
                     Path dirPath = Paths.get("test_report");
                     if (!Files.exists(dirPath)) {

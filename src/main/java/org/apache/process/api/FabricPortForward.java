@@ -71,7 +71,7 @@ public class FabricPortForward {
                     }
                 }
             } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
