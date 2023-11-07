@@ -31,8 +31,10 @@ import java.util.concurrent.TimeUnit;
 
 
 public class EnvClean {
-    public EnvClean(){}
-    public boolean clean(HashMap<String, Object> paramsMap){
+    public EnvClean() {
+    }
+
+    public boolean clean(HashMap<String, Object> paramsMap) {
         System.out.println("************************************");
         System.out.println("*       Delete app and env...      *");
         System.out.println("************************************");
@@ -42,14 +44,14 @@ public class EnvClean {
 
         boolean result = true;
         /* delete vela application and namespace */
-        try{
+        try {
             AuthAction authAction = new AuthAction();
             authAction.setToken("login");
             AppActions appActions = new AppActions();
             appActions.deleteOAM(namespace, namespace).close();
             boolean isDeletedsuccessed = false;
             int times = 5;
-            while(!isDeletedsuccessed && times>0){
+            while (!isDeletedsuccessed && times > 0) {
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(appActions.deleteApplication(namespace));
                 TimeUnit.SECONDS.sleep(3);
                 times--;
@@ -59,16 +61,15 @@ public class EnvClean {
             EnvActions envActions = new EnvActions();
             isDeletedsuccessed = false;
             times = 5;
-            while(!isDeletedsuccessed && times>0){
+            while (!isDeletedsuccessed && times > 0) {
                 isDeletedsuccessed = PrintInfo.isResponseSuccess(envActions.deleteEnv(namespace));
                 TimeUnit.SECONDS.sleep(3);
-                times --;
+                times--;
                 authAction.setToken("refresh_token");
             }
             System.out.printf("vela namespace:%s delete success!%n", namespace);
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Fail to delete vela application/namespace!");
+        } catch (Exception e) {
+            System.out.println("Fail to delete vela application/namespace! Error message: " + e);
             result = false;
         }
 
@@ -76,7 +77,7 @@ public class EnvClean {
         try {
             api.deleteNamespace(namespace, null, null, null, null, null, null);
             System.out.println("Namespace " + namespace + " deleted successfully.");
-        }catch (ApiException e){
+        } catch (ApiException e) {
             System.err.println("Failed to delete namespace " + namespace + ": " + e.getResponseBody());
             result = false;
         }

@@ -27,18 +27,19 @@ import java.util.Objects;
 
 public class AuthAction {
     public static final String APP_API = "auth";
-    public String URL;
+    private final String URL;
+    private final OkHttpClient client;
     public AuthAction(){
+        client = new OkHttpClient();
         URL = "http://"+ Configs.IP +"/"+ Configs.KUBEVELA_API + "/" + APP_API;
     }
     public void setToken(String action) {
-        OkHttpClient client = new OkHttpClient();
+
         Request request = null;
         if("login".equals(action)) {
             String url = URL + "/" + "login";
-            MediaType mediaType = MediaType.parse("application/json");
             String bodyContent = String.format("{\n \"code\": \"string\",\n \"password\": \"%s\",\n  \"username\": \"%s\"\n}", Configs.VELAUX_PASSWORD, Configs.VELAUX_USERNAME);
-            RequestBody body = RequestBody.create(mediaType, bodyContent);
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyContent);
             request = new Request.Builder()
                     .url(url)
                     .post(body)
@@ -55,18 +56,24 @@ public class AuthAction {
                     .addHeader("refreshToken", Configs.REFRESH_TOKEN)
                     .build();
         }
-        try(Response response = client.newCall(request).execute();){
-            JSONObject json = new JSONObject(response.body().string());
-            //response.close();
-            if(json.has("accessToken") && !Objects.equals(json.getString("accessToken"), "")){
-                Configs.TOKEN = json.getString("accessToken");
-                Configs.Authorization = "Bearer "+Configs.TOKEN;
-                Configs.REFRESH_TOKEN = json.getString("refreshToken");
-            }else{
-                System.out.printf("%s error!%n",action);
+
+        int retryTimes = 3;
+        boolean isSuccess = false;
+        while(retryTimes-- > 0 && !isSuccess){
+            try(Response response = client.newCall(request).execute();){
+                JSONObject json = new JSONObject(response.body().string());
+                if(json.has("accessToken") && !Objects.equals(json.getString("accessToken"), "")){
+                    Configs.TOKEN = json.getString("accessToken");
+                    Configs.Authorization = "Bearer "+Configs.TOKEN;
+                    Configs.REFRESH_TOKEN = json.getString("refreshToken");
+                    isSuccess = true;
+                }else{
+                    System.out.printf("%s error!%n", action);
+                }
+            }catch(Exception e){
+                System.out.printf("%s error! %n", action);
             }
-        }catch(Exception e){
-            System.out.println(e);
         }
+
     }
 }

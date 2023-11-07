@@ -32,24 +32,24 @@ import java.util.concurrent.TimeUnit;
 public class QueryTestPod {
     /**
      * get dictionary and file about test result from pod.
-     * @param config ask config.
-     * @param testPodName test pod name.
-     * @param namespace pod namespace.
+     *
+     * @param config       ask config.
+     * @param testPodName  test pod name.
+     * @param namespace    pod namespace.
      * @param testCodePath test code path.
      * @return boolean.
-     * @throws IOException io exception.
+     * @throws IOException          io exception.
      * @throws InterruptedException interrupt exception.
      */
     public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath) throws IOException, InterruptedException {
         System.out.println("********************query status and get result********************");
-        TimeUnit.SECONDS.sleep(3);
+        //TimeUnit.SECONDS.sleep(3);
 
-        //KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
         String podStatus = null;
-        try(KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()){
+        try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
-        }catch (Exception ignored) {
-            System.out.println("podStatus set Pending..");
+        } catch (Exception ignored) {
+            System.out.println("PodStatus set Pending..");
         }
 
         if (podStatus == null) {
@@ -59,19 +59,19 @@ public class QueryTestPod {
         boolean isWaitingTest = true;
         while ("Pending".equals(podStatus) || "Running".equals(podStatus) || isWaitingTest) {
             TimeUnit.SECONDS.sleep(5);
-            try(KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()){
+            try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
                 podStatus = client.pods().inNamespace(namespace).withName(testPodName).get().getStatus().getPhase();
-            }catch(Exception e){
-                System.out.println("Query pod fail! retry again...");
+            } catch (Exception e) {
+                System.out.println("Query pod fail! Errormessage: %s. Retry again..." + e.getMessage());
             }
 
             if (podStatus == null) {
                 podStatus = "Pending";
             }
             if (isWaitingTest) {
-                System.out.printf("waiting for %s test done...%n", testPodName);
+                System.out.printf("Waiting for %s test done...%n", testPodName);
             } else {
-                System.out.printf("current pod status is %s, waitting pod stop...%n", podStatus);
+                System.out.printf("Current pod status is %s, waiting pod stop...%n", podStatus);
             }
 
             // Check if the execution of the test program has ended.
@@ -81,14 +81,12 @@ public class QueryTestPod {
                     cmdOutput = executeCMD.execCommandOnPod(testPodName, namespace, "/bin/bash", "-c", "ls /root | grep testdone\n");
 
                 } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("query error! continue to query...");
+                    System.out.println("Query error! Error message: %s. Continue to query..." + e.getMessage());
                 }
 
                 // if the test program ends, get the result.
                 if (cmdOutput != null && cmdOutput.contains("testdone")) {
                     System.out.println("test done !");
-
                     isWaitingTest = false;
 
                     Path filePath = Paths.get("testlog.txt");
@@ -97,9 +95,9 @@ public class QueryTestPod {
                     }
                     int downloaTimes = 3;
                     boolean isStop = true;
-                    while(isStop && downloaTimes>0) {
-                            isStop = !downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
-                            downloaTimes--;
+                    while (isStop && downloaTimes > 0) {
+                        isStop = !downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
+                        downloaTimes--;
                     }
 
                     Path dirPath = Paths.get("test_report");
@@ -108,10 +106,9 @@ public class QueryTestPod {
                     }
                     downloaTimes = 3;
                     isStop = true;
-                    while(isStop && downloaTimes>0) {
-
-                            isStop = !downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
-                            downloaTimes--;
+                    while (isStop && downloaTimes > 0) {
+                        isStop = !downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
+                        downloaTimes--;
                     }
                 }
             }
@@ -123,12 +120,14 @@ public class QueryTestPod {
 
     /**
      * download file from pod.
-     * @param config ask config.
-     * @param namespace pod namespace.
-     * @param podName pod name.
+     *
+     * @param config        ask config.
+     * @param namespace     pod namespace.
+     * @param podName       pod name.
      * @param containerName pod's container name.
-     * @param srcPath file path in pod.
-     * @param targetPath target file path.
+     * @param srcPath       file path in pod.
+     * @param targetPath    target file path.
+     * @return boolean.
      */
     public boolean downloadFile(String config, String namespace, String podName, String containerName, String srcPath, Path targetPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
@@ -136,20 +135,21 @@ public class QueryTestPod {
             System.out.printf("File(%s) copied successfully!%n", srcPath);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.printf("Fail to get %s!%n", srcPath);
+            System.out.printf("Fail to get %s! Error message: %s%n", srcPath, e.getMessage());
             return false;
         }
     }
 
     /**
      * download dictionary from pod.
-     * @param config ask config.
-     * @param namespace pod namespace.
-     * @param podName pod name.
+     *
+     * @param config        ask config.
+     * @param namespace     pod namespace.
+     * @param podName       pod name.
      * @param containerName pod's container name.
-     * @param srcPath dictionary path in pod
-     * @param tarPath target dictionary path.
+     * @param srcPath       dictionary path in pod
+     * @param tarPath       target dictionary path.
+     * @return boolean.
      */
     public boolean downloadDir(String config, String namespace, String podName, String containerName, String srcPath, Path tarPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
@@ -157,8 +157,7 @@ public class QueryTestPod {
             System.out.printf("Directory(%s) copied successfully!%n", srcPath);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.printf("Fail to get %s!%n", srcPath);
+            System.out.printf("Fail to get %s! Error message: %s%n", srcPath, e.getMessage());
             return false;
         }
     }

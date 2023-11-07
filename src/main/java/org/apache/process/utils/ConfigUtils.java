@@ -22,8 +22,6 @@ package org.apache.process.utils;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.util.Config;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,16 +30,13 @@ import java.util.Base64;
 
 
 public class ConfigUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigUtils.class);
 
     public String setConfig(String kubeConfig) throws IOException {
 
-        LOGGER.info("Set config... ");
         String usrHome = System.getProperty("user.home");
         String kubeDirPath = String.format("%s/.kube", usrHome);
         File kubeDir = new File(kubeDirPath);
         if (!kubeDir.exists() && !kubeDir.mkdirs()) {
-            LOGGER.error(String.format("%s directory create fail！", kubeDirPath));
             System.out.printf("%s directory create fail！%n", kubeDirPath);
         }
         String kubeFilePath = String.format("%s/.kube/config", usrHome);
@@ -50,7 +45,6 @@ public class ConfigUtils {
             kubeFile.delete();
         }
         if (!kubeFile.createNewFile()) {
-            LOGGER.error(String.format("%s create fail！", kubeFilePath));
             System.out.printf("%s create fail！%n", kubeFilePath);
         }
         try {
@@ -59,7 +53,6 @@ public class ConfigUtils {
             fileWriter.write(kubeConfig);
             fileWriter.close();
         } catch (IOException e) {
-            LOGGER.error(String.format("write %s error!", kubeFilePath));
             System.out.printf("write %s error!%n", kubeFilePath);
         }
         return kubeFilePath;
