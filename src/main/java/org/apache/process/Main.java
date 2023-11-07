@@ -56,7 +56,6 @@ public class Main {
         }
 
         try {
-            System.out.println();
             String inputYamlString = paramsMap.get("yamlString");
             LinkedHashMap<String, Object> inputMap = yamlToMap(inputYamlString);
             String action = inputMap.get("action").toString();
@@ -96,7 +95,7 @@ public class Main {
             }
             System.exit(1);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Execute error! Message: "+e.getMessage());
         }
         System.exit(1);
     }

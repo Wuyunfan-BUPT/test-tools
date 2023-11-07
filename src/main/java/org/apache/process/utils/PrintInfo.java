@@ -29,9 +29,8 @@ public class PrintInfo {
         if(response.isSuccessful()){
             System.out.println(name);
         }else{
-            System.out.println(response.body().string());
+            System.out.println("Fail! "+ response.body().string());
         }
-        response.close();
     }
 
     public static void printRocketInfoAndExit(Response response, String name){

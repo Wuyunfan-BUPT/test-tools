@@ -33,25 +33,24 @@ import java.util.concurrent.TimeUnit;
 
 
 public class Deploy {
-    public boolean startDeploy(HashMap<String, Object> paramsMap) throws  InterruptedException {
+    public boolean startDeploy(HashMap<String, Object> paramsMap) throws InterruptedException {
         System.out.println("************************************");
         System.out.println("*     Create namespace and deploy...     *");
         System.out.println("************************************");
 
         AuthAction authAction = new AuthAction();
         authAction.setToken("login");
-        TimeUnit.SECONDS.sleep(1);
+        //TimeUnit.SECONDS.sleep(1);
 
         String namespace = paramsMap.get("namespace").toString();
-
         System.out.printf("Generate namespace(%s) and namespace(%s)%n", namespace, namespace);
 
         EnvActions envActions = new EnvActions();
         String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
-        try(Response response = envActions.createEnv(envBodyContent);){
+        try (Response response = envActions.createEnv(envBodyContent);) {
             PrintInfo.printRocketInfo(response, String.format("Generate namespace(%s) success!", namespace));
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.printf("Error! %s \n", e);
             return false;
         }
 
@@ -61,65 +60,64 @@ public class Deploy {
         authAction.setToken("refresh_token");
         String componentProperty = paramsMap.get("helm").toString();
         String bodyContent = String.format(Deploymodel.APPLICATION_BODY_COMPONENT, namespace, Configs.PROJECT_NAME, paramsMap.get("velaAppDescription"), namespace, namespace, paramsMap.get("repoName"), componentProperty);
-        try(Response createAppResponse = appActions.createApplication(bodyContent)){
+        try (Response createAppResponse = appActions.createApplication(bodyContent)) {
             PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", namespace)));
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.printf("Error! %s \n", e);
             return false;
         }
 
         System.out.printf("deploy %s Application%n", namespace);
 
-        String workflowName = "workflow-"+namespace;
+        String workflowName = "workflow-" + namespace;
         String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
         authAction.setToken("refresh_token");
-        try(Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);){
+        try (Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);) {
             PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", namespace));
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.printf("Error! %s \n", e);
             return false;
         }
 
-        System.out.printf("Query %s Application status%n",namespace);
+        System.out.printf("Query %s Application status%n", namespace);
 
         int querryTime = Integer.parseInt(paramsMap.get("waitTimes").toString()) / 5;
         Response response = null;
-            try{
-                while(querryTime>0) {
-                    authAction.setToken("refresh_token");
-                    response = appActions.getApplicationStatus(namespace, namespace);
-                    JSONObject json;
-                    if (response.body() != null) {
-                        json = new JSONObject(response.body().string());
-                        response.close();
-                    }else{
-                        response.close();
-                        continue;
-                    }
-
-                    String workflowsStatus = json.getJSONObject("status").getJSONObject("workflow").getString("status");
-                    String message =  new JSONObject(json.getJSONObject("status").getJSONArray("services").get(0).toString()).getString("message");
-
-                    if ("succeeded".equals(workflowsStatus)) {
-                        System.out.println("message: " + message);
-                        break;
-                    } else if ("executing".equals(workflowsStatus)) {
-                        System.out.println("waiting...");
-                        System.out.println("message: " + message);
-                        querryTime--;
-                        TimeUnit.SECONDS.sleep(5);
-                    } else {
-                        System.out.println(message);
-                        return false;
-                    }
-                }
-            }catch (Exception e) {
-                if(response != null){
+        try {
+            while (querryTime > 0) {
+                authAction.setToken("refresh_token");
+                response = appActions.getApplicationStatus(namespace, namespace);
+                JSONObject json;
+                if (response.body() != null) {
+                    json = new JSONObject(response.body().string());
                     response.close();
+                } else {
+                    response.close();
+                    continue;
                 }
-                e.printStackTrace();
-                return false;
+
+                String workflowsStatus = json.getJSONObject("status").getJSONObject("workflow").getString("status");
+                String message = new JSONObject(json.getJSONObject("status").getJSONArray("services").get(0).toString()).getString("message");
+
+                if ("succeeded".equals(workflowsStatus)) {
+                    System.out.println("Success! Message: " + message);
+                    break;
+                } else if ("executing".equals(workflowsStatus)) {
+                    System.out.println("Waiting... Message : " + message);
+                    querryTime--;
+                    TimeUnit.SECONDS.sleep(5);
+                } else {
+                    System.out.println("Error! Message: " + message);
+                    return false;
+                }
             }
-            return true;
+        } catch (Exception e) {
+            if (response != null) {
+                response.close();
+            }
+            System.out.println("Error! " + e.getMessage());
+            return false;
+        }
+        return true;
     }
 }

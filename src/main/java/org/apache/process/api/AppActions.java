@@ -25,13 +25,17 @@ import org.apache.process.config.Configs;
 import java.io.IOException;
 public class AppActions {
     public static final String APP_API = "applications";
-    public String URL;
+    private final OkHttpClient client;
+    private final String URL;
+    private final MediaType mediaType;
     public AppActions(){
+        client = new OkHttpClient();
         URL = "http://"+ Configs.IP +"/"+ Configs.KUBEVELA_API + "/" + APP_API;
+        mediaType = MediaType.parse("application/json");
     }
     public Response createApplication(String bodyContent) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
+        //OkHttpClient client = new OkHttpClient();
+        //MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType,  bodyContent);
         Request request = new Request.Builder()
                 .url(URL)
@@ -44,9 +48,8 @@ public class AppActions {
         return client.newCall(request).execute();
     }
     public Response detailapplication(String name) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-
-        String url = URL+"/"+name;// String.format("https://stoplight.io/mocks/kubevela/kubevela/131220907/api/v1/applications/%s", name);
+        //OkHttpClient client = new OkHttpClient();
+        String url = URL+"/"+name;
 
         Request request = new Request.Builder()
                 .url(url)
@@ -57,9 +60,9 @@ public class AppActions {
         return client.newCall(request).execute();
     }
     public Response createComponentForApplicatuion(String appName, String bodyContent) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-          String url = URL + "/"+appName+"/components";
-        MediaType mediaType = MediaType.parse("application/json");
+        //OkHttpClient client = new OkHttpClient();
+        String url = URL + "/"+appName+"/components";
+
         RequestBody body = RequestBody.create(mediaType, bodyContent);
         Request request = new Request.Builder()
                 .url(url)
@@ -73,9 +76,8 @@ public class AppActions {
     }
 
     public Response deployOrUpgradeApplication(String appName,String bodyContent) throws IOException {
-        OkHttpClient client = new OkHttpClient();
-
-        MediaType mediaType = MediaType.parse("application/json");
+        //OkHttpClient client = new OkHttpClient();
+        //MediaType mediaType = MediaType.parse("application/json");
         String url = URL + "/"+appName+"/deploy";
 
         RequestBody body = RequestBody.create(mediaType, bodyContent);
@@ -91,9 +93,8 @@ public class AppActions {
     }
 
     public Response getApplicationStatus(String appName, String envName) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
         String url = URL + "/"+appName+"/envs/"+envName+"/status";
-
 
         Request request = new Request.Builder()
                 .url(url)
@@ -106,10 +107,10 @@ public class AppActions {
     }
 
     public boolean createApplicationEnv(String appName, String envName) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
 
         String url = URL + "/"+appName+"/envs";
-        MediaType mediaType = MediaType.parse("application/json");
+        //MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = RequestBody.create(mediaType, String.format("{\n  \"name\": \"%s\"\n}", envName));
         Request request = new Request.Builder()
                 .url(url)
@@ -124,7 +125,7 @@ public class AppActions {
     }
 
     public Response getAppComponentList(String appName, String envName) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
         String url = URL + "/"+appName+"/components";
 
         Request request = new Request.Builder()
@@ -134,14 +135,12 @@ public class AppActions {
                 .addHeader("Authorization", Configs.Authorization)
                 .build();
 
-        Response response = client.newCall(request).execute();
-        return response;
+        return client.newCall(request).execute();
     }
 
     public Response setAppEnv(String appName, String envName) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
         String url = URL + "/"+appName+"/envs/"+envName;
-
 
         RequestBody body = RequestBody.create(null, new byte[0]);
 
@@ -160,7 +159,7 @@ public class AppActions {
 
     public Response deleteApplication(String appName) throws IOException {
 
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
         String url = URL + "/"+appName;
 
         Request request = new Request.Builder()
@@ -171,14 +170,12 @@ public class AppActions {
                 .addHeader("Authorization", Configs.Authorization)
                 .build();
 
-        Response response = client.newCall(request).execute();
-        return response;
+        return client.newCall(request).execute();
     }
 
     public Response deleteComponet(String appName, String compName) throws IOException {
         String url = URL + "/"+appName + "/components/" + compName;
-        System.out.println(url);
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(url)
@@ -192,7 +189,7 @@ public class AppActions {
 
     public Response deleteOAM(String namespace, String appName) throws IOException {
         String url = "http://"+ Configs.IP +"/v1/namespaces/" + namespace+"/applications/"+appName;
-        OkHttpClient client = new OkHttpClient();
+        //OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(url)

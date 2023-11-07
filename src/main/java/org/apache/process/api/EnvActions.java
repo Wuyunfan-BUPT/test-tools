@@ -26,15 +26,14 @@ import java.io.IOException;
 
 public class EnvActions {
     public static final String APP_API = "envs";
-
+    private final OkHttpClient client;
     public String URL;
     public EnvActions(){
+        client  = new OkHttpClient();
         URL = "http://"+ Configs.IP +"/"+ Configs.KUBEVELA_API + "/" + APP_API;
     }
 
     public Response listEnv() throws IOException {
-        OkHttpClient client = new OkHttpClient();
-
         Request request = new Request.Builder()
                 .url(URL)
                 .get()
@@ -45,10 +44,8 @@ public class EnvActions {
         return client.newCall(request).execute();
     }
     public Response createEnv(String bodyContent) throws IOException{
-        OkHttpClient client = new OkHttpClient();
-
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(mediaType, bodyContent);
+        //OkHttpClient client = new OkHttpClient();
+        RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyContent);
 
         Request request = new Request.Builder()
                 .url(URL)
@@ -63,8 +60,7 @@ public class EnvActions {
 
     public Response deleteEnv(String namespace) throws IOException {
         String url = URL + "/" +namespace;
-        OkHttpClient client = new OkHttpClient();
-
+        //OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url(url)
