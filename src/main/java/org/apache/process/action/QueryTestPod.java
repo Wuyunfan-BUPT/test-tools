@@ -104,7 +104,7 @@ public class QueryTestPod {
                     if (!Files.exists(dirPath)) {
                         Files.createDirectory(dirPath);
                     }
-                    downloaTimes = 3;
+                    downloaTimes = 5;
                     isStop = true;
                     while (isStop && downloaTimes > 0) {
                         isStop = !downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
@@ -154,8 +154,19 @@ public class QueryTestPod {
     public boolean downloadDir(String config, String namespace, String podName, String containerName, String srcPath, Path tarPath) {
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.pods().inNamespace(namespace).withName(podName).inContainer(containerName).dir(srcPath).copy(tarPath);
-            System.out.printf("Directory(%s) copied successfully!%n", srcPath);
-            return true;
+            String xmlPath = tarPath+"/"+srcPath;
+            File filePath = new File(xmlPath);
+            String[] files = filePath.list((dir, name) -> {
+                return name.endsWith(".xml");
+            });
+            if (files != null) {
+                System.out.printf("Directory(%s) copied successfully!\n", srcPath);
+                return true;
+            } else {
+                System.out.printf("Directory(%s) copied fail! \n", srcPath);
+                return false;
+            }
+
         } catch (Exception e) {
             System.out.printf("Fail to get %s! Error message: %s%n", srcPath, e.getMessage());
             return false;
