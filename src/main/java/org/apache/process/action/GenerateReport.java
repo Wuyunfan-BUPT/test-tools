@@ -23,7 +23,7 @@ public class GenerateReport {
         // set test code base url.
         String repoBaseUrl = splitHttps(envMap.get("CODE").toString()) + "/tree/" + envMap.get("BRANCH").toString() + "/" + envMap.get("CODE_PATH").toString();
         // test-report path.
-        String xmlPath = String.format("/root/code/%s/test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString(), envMap.get("CODE_PATH").toString());
+        String xmlPath = String.format("test_report/root/code/%s/target/surefire-reports", envMap.get("CODE_PATH").toString());
         List<File> fileList = new ArrayList<>();
         File filePath = new File(xmlPath);
         // filter .xml format files.
