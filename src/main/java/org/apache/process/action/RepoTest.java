@@ -102,6 +102,6 @@ public class RepoTest {
 
         // create pod
         api.createNamespacedPod(namespace, pod_template, null, null, null, null);
-        return new QueryTestPod().getPodResult(inputMap.get("askConfig").toString(), testPodName, namespace, envMap.get("CODE_PATH").toString());
+        return new QueryTestPod().getPodResult(inputMap.get("askConfig").toString(), testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
     }
 }

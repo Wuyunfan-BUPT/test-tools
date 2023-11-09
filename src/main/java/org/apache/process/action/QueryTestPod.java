@@ -27,6 +27,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 public class QueryTestPod {
@@ -41,7 +43,7 @@ public class QueryTestPod {
      * @throws IOException          io exception.
      * @throws InterruptedException interrupt exception.
      */
-    public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath) throws IOException, InterruptedException {
+    public boolean getPodResult(String config, String testPodName, String namespace, String testCodePath, int waitTimes) throws IOException, InterruptedException {
         System.out.println("********************query status and get result********************");
         //TimeUnit.SECONDS.sleep(3);
 
@@ -56,7 +58,9 @@ public class QueryTestPod {
             podStatus = "Pending";
         }
         // mark if program has been executed.
+        System.out.println("waitting: "+waitTimes);
         boolean isWaitingTest = true;
+        LocalDateTime startTime = LocalDateTime.now();
         while ("Pending".equals(podStatus) || "Running".equals(podStatus) || isWaitingTest) {
             TimeUnit.SECONDS.sleep(5);
             try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
@@ -79,13 +83,17 @@ public class QueryTestPod {
                 String cmdOutput = null;
                 try (ExecuteCMD executeCMD = new ExecuteCMD(config)) {
                     cmdOutput = executeCMD.execCommandOnPod(testPodName, namespace, "/bin/bash", "-c", "ls /root | grep testdone\n");
-
                 } catch (Exception e) {
                     System.out.println("Query error! Error message: %s. Continue to query..." + e.getMessage());
                 }
 
+                boolean isTimeout = ChronoUnit.SECONDS.between(startTime, LocalDateTime.now())>=waitTimes;
+                if(isTimeout){
+                    System.out.println("Current pod timeout! Stop pod...");
+                }
+
                 // if the test program ends, get the result.
-                if (cmdOutput != null && cmdOutput.contains("testdone")) {
+                if ((cmdOutput != null && cmdOutput.contains("testdone")) || isTimeout) {
                     System.out.println("test done !");
                     isWaitingTest = false;
 
@@ -93,7 +101,7 @@ public class QueryTestPod {
                     if (!Files.exists(filePath)) {
                         Files.createFile(filePath);
                     }
-                    int downloaTimes = 3;
+                    int downloaTimes = 5;
                     boolean isStop = true;
                     while (isStop && downloaTimes > 0) {
                         isStop = !downloadFile(config, namespace, testPodName, testPodName, "/root/testlog.txt", filePath);
@@ -110,6 +118,17 @@ public class QueryTestPod {
                         isStop = !downloadDir(config, namespace, testPodName, testPodName, String.format("/root/code/%s/target/surefire-reports", testCodePath), dirPath);
                         downloaTimes--;
                     }
+                }
+
+                if(isTimeout){
+                    podStatus = "Failed";
+                    try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
+                        client.pods().inNamespace(namespace).withName(testPodName).delete();
+                        System.out.printf("Delete timeout pod: %s success!\n" , testPodName);
+                    } catch (Exception e) {
+                        System.out.printf("Delete timeout pod: %s success!\n", testPodName);
+                    }
+                    break;
                 }
             }
         }

@@ -82,8 +82,8 @@ public class Main {
                 isSuccessed = new Deploy().startDeploy(deployMap);
             } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
-                new RepoTest().runTest(inputMap);
-                isSuccessed = new GenerateReport().generateReportMarkDown(inputMap);
+                isSuccessed = new RepoTest().runTest(inputMap);
+                isSuccessed = isSuccessed && new GenerateReport().generateReportMarkDown(inputMap);
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
