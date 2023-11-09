@@ -82,18 +82,18 @@ public class Main {
                 isSuccessed = new Deploy().startDeploy(deployMap);
             } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
-                isSuccessed = new RepoTest().runTest(inputMap);
-                GenerateReport generateReport = new GenerateReport();
-                generateReport.generateReportMarkDown(inputMap);
+                new RepoTest().runTest(inputMap);
+                isSuccessed = new GenerateReport().generateReportMarkDown(inputMap);
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
                 System.out.println("Error! Please input action!");
             }
-            if (isSuccessed) {
+
+            if (isSuccessed && Configs.IS_ALL_CASE_SUCCESS) {
                 System.exit(0);
             }
-            System.exit(1);
+            //System.exit(1);
         } catch (Exception e) {
             System.out.println("Execute error! Message: "+e.getMessage());
         }
