@@ -46,7 +46,7 @@ public class Configs {
 
     public static String VELA_NAMESPACE = "vela-system";
     public static String VELA_POD_LABELS = "addon-velaux";
-
+    public static boolean IS_ALL_CASE_SUCCESS = true;
     // open port
     public static final int PORT_FROWARD = 9082;
     // velaux IP

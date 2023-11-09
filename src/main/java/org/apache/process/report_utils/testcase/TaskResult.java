@@ -1,5 +1,6 @@
 package org.apache.process.report_utils.testcase;
 
+import org.apache.process.config.Configs;
 import org.apache.process.report_utils.*;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -122,6 +123,7 @@ public class TaskResult {
         allBadCase.addAll(errorCaseMap.values());
 
         if(allBadCase.size()>0){
+            Configs.IS_ALL_CASE_SUCCESS = false;
             builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️️", 4);
             builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️ Some Case Fail/Error ! ⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
             builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
