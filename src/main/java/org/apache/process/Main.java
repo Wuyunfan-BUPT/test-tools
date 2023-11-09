@@ -83,7 +83,7 @@ public class Main {
             } else if ("test".equals(action)) {
                 inputMap.put("askConfig", askConfig);
                 isSuccessed = new RepoTest().runTest(inputMap);
-                isSuccessed = isSuccessed && new GenerateReport().generateReportMarkDown(inputMap);
+                isSuccessed = new GenerateReport().generateReportMarkDown(inputMap) && isSuccessed;
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
