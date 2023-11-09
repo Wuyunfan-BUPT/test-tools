@@ -93,7 +93,6 @@ public class Main {
             if (isSuccessed && Configs.IS_ALL_CASE_SUCCESS) {
                 System.exit(0);
             }
-            //System.exit(1);
         } catch (Exception e) {
             System.out.println("Execute error! Message: "+e.getMessage());
         }
