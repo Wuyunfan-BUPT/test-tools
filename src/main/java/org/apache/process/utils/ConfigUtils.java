@@ -19,9 +19,6 @@
 
 package org.apache.process.utils;
 
-//import io.kubernetes.client.openapi.ApiClient;
-//import io.kubernetes.client.openapi.Configuration;
-//import io.kubernetes.client.util.Config;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -58,11 +55,6 @@ public class ConfigUtils {
         }
         return kubeFilePath;
     }
-
-//    public void setKubeClientConfig(String kubeConfigPath) throws IOException {
-//        ApiClient client = Config.fromConfig(kubeConfigPath);
-//        Configuration.setDefaultApiClient(client);
-//    }
 
     /**
      * get velaUX username and password
