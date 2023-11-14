@@ -85,8 +85,9 @@ public class Deploy {
         int waitTimes = Integer.parseInt(paramsMap.get("waitTimes").toString());
         LocalDateTime startTime = LocalDateTime.now();
         Response response = null;
-        try {
-            while (ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) <= waitTimes) {
+
+        while (ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) <= waitTimes) {
+            try {
                 authAction.setToken("refresh_token");
                 response = appActions.getApplicationStatus(namespace, namespace);
                 JSONObject json;
@@ -108,19 +109,18 @@ public class Deploy {
                     log.info("Waiting... Message : " + message);
                     TimeUnit.SECONDS.sleep(5);
                 } else {
-                    log.error("Error! Message: {}", message);
+                    log.error("Fail! Message: {}", message);
                     return false;
                 }
+            } catch (Exception e) {
+                log.error("Error! Message: {}", e.getMessage());
             }
-        } catch (Exception e) {
-            if (response != null) {
-                response.close();
-            }
-            log.error("Error! Message: {}", e.getMessage());
-            return false;
+        }
+        if (response != null) {
+            response.close();
         }
 
-        if(ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) > waitTimes){
+        if (ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) > waitTimes) {
             log.error("Error! Deploy timeout !");
             return false;
         }
