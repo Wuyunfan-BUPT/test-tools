@@ -103,6 +103,6 @@ public class RepoTest {
                 }
             }
         }
-        return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
+        return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.getOrDefault("WAIT_TIME", "900").toString()));
     }
 }
