@@ -24,11 +24,6 @@
         <artifactId>json</artifactId>
         <version>20230227</version>
       </dependency>
-<!--    <dependency>-->
-<!--      <groupId>io.kubernetes</groupId>-->
-<!--      <artifactId>client-java</artifactId>-->
-<!--      <version>17.0.2</version>-->
-<!--    </dependency>-->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>

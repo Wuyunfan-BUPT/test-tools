@@ -102,8 +102,7 @@ public class RepoTest {
                     log.error("create pod {} failed, retry again...", testPodName);
                 }
             }
-
-            return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
         }
+        return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
     }
 }

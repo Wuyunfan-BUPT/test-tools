@@ -75,7 +75,6 @@ public class Main {
             }
 
             configUtils.setConfig(askConfig);
-            //configUtils.setKubeClientConfig(kubeConfigPath);
             new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
 
             boolean isSuccessed = false;
