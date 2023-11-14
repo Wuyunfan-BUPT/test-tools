@@ -19,16 +19,18 @@
 
 package org.apache.process.action;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.process.api.FabricPortForward;
 
+@Slf4j
 public class PortForward {
-    public void startPortForward(String namespace, String podLabels, int localPort, String config) throws InterruptedException {
+    public void startPortForward(String namespace, String podLabels, int localPort) throws InterruptedException {
         FabricPortForward fabricPortForward = new FabricPortForward();
-        System.out.println("Start port forward....");
+        log.info("Start port forward....");
         Thread thread = new Thread(
                 () -> {
                     try {
-                        fabricPortForward.podPortForward(namespace, podLabels, localPort, config);
+                        fabricPortForward.podPortForward(namespace, podLabels, localPort);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

@@ -25,28 +25,30 @@ import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class ExecuteCMD implements AutoCloseable{
+@Slf4j
+public class ExecuteCMD implements AutoCloseable {
     private final KubernetesClient client;
+
     @SuppressWarnings("java:S106")
-    public ExecuteCMD(String config) {
-        this.client = new KubernetesClientBuilder().withConfig(config).build();
+    public ExecuteCMD() {
+        this.client = new KubernetesClientBuilder().build();
     }
+
     @SneakyThrows
-    public String execCommandOnPod(String podName, String namespace, String... cmd) throws ExecutionException, InterruptedException, TimeoutException {
+    public String execCommandOnPod(String podName, String namespace, String... cmd) {
         Pod pod = client.pods().inNamespace(namespace).withName(podName).get();
         CompletableFuture<String> data = new CompletableFuture<>();
         try (ExecWatch execWatch = execCmd(pod, data, cmd)) {
             return data.get(20, TimeUnit.SECONDS);
         }
-
     }
+
     @Override
     public void close() {
         client.close();
@@ -75,12 +77,10 @@ public class ExecuteCMD implements AutoCloseable{
 
         @Override
         public void onOpen() {
-            System.out.println("checking testdone... ");
         }
 
         @Override
         public void onFailure(Throwable t, Response failureResponse) {
-            System.err.println(t.getMessage());
             data.completeExceptionally(t);
         }
 

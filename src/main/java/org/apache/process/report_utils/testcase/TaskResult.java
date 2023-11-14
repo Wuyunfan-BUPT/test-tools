@@ -12,8 +12,8 @@ import java.util.*;
  * Created by wangtong.wt on 2017/3/20.
  *
  * @author wangtong.wt
- * @date 2017/03/20
  * @author wuyfee.
+ * @date 2017/03/20
  * @date 2023/07/28
  */
 @Data
@@ -30,7 +30,8 @@ public class TaskResult {
     private Map<String, CaseResult> skipCaseMap = new HashMap<>();
     private Map<String, String> caseTypeMap = new HashMap<>();
 
-    public TaskResult() {}
+    public TaskResult() {
+    }
 
     public void addCostTime(double time) {
         this.costTime = this.costTime + time;
@@ -90,11 +91,10 @@ public class TaskResult {
     }
 
     /**
-     *
-     * @param repoName repository name.
+     * @param repoName    repository name.
      * @param repoBaseUrl test-code base url.
-     * @param gitBranch repository beanch.
-     * @param codePath test-code poth in repository.
+     * @param gitBranch   repository beanch.
+     * @param codePath    test-code poth in repository.
      * @param githubToken GitHub access token.
      * @return markdown content.
      * @throws IOException exception.
@@ -113,31 +113,29 @@ public class TaskResult {
         GetGithubRepoInfo getGithubRepoInfo = new GetGithubRepoInfo();
         HashMap<String, RepoFileInfo> fileInfoMap = new HashMap<>();
 
-        String url = GetGithubRepoInfo.API_BASE_URL+ "/"+ repoName + "/contents/" + codePath;
+        String url = GetGithubRepoInfo.API_BASE_URL + "/" + repoName + "/contents/" + codePath;
         // get all files and their url in repository.
-        getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken ,fileInfoMap);
+        getGithubRepoInfo.getAllFilePath(url, gitBranch, githubToken, fileInfoMap);
         builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", 4);
         builder.addHeader(":x: Failed/Error Case Detail", 3);
 
         List<CaseResult> allBadCase = new ArrayList<>(failureCaseMap.values());
         allBadCase.addAll(errorCaseMap.values());
 
-        if(allBadCase.size()>0){
+        if (allBadCase.size() > 0) {
             Configs.IS_ALL_CASE_SUCCESS = false;
-            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️️", 4);
-            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️ Some Case Fail/Error ! ⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
-            builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
+            //builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️️", 4);
+            builder.addHeader(String.format("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️ %s: Fail/Error ! ⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", codePath), 4);
+            //builder.addHeader("⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⬇️⬇️⬇️⬇️⬇️⬇️⬇️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️⚡️", 4);
         }
         for (CaseResult badCase : allBadCase) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
 
             String caseUrl = getGithubRepoInfo.getCaseUrl(fileInfoMap, githubToken, getClassName(badCase.getClassName()), badCase.getMethodName(), repoName, gitBranch);
-            if(Objects.equals(caseUrl, "")) {
+            if (Objects.equals(caseUrl, "")) {
                 caseUrl = repoBaseUrl;
             }
             linkBuilder.setLink(badCase.getClassName() + "." + badCase.getMethodName(), caseUrl);
-
-            System.out.println(caseUrl);
 
             builder.addHeader("Name: " + linkBuilder.build() +
                     " Time: " + badCase.getTime() + "s", 4);
@@ -155,10 +153,10 @@ public class TaskResult {
 
             builder.addCollapse("Exception Detail", exceptionBuilder.build());
         }
-        if(allBadCase.size()==0){
-            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
-            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉 All case Pass! 🎉🎉🎉🎉🎉🎉🎉🎉", 4);
-            builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
+        if (allBadCase.size() == 0) {
+            //builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
+            builder.addHeader(String.format("🎉🎉🎉🎉🎉🎉🎉🎉 %s: Pass ! 🎉🎉🎉🎉🎉🎉🎉🎉", codePath), 4);
+            //builder.addHeader("🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉", 4);
         }
 
         writeContentToMarkdown(repoBaseUrl, builder, successCaseMap, fileInfoMap, ":white_check_mark: Success Cases", 3, "✅");
@@ -178,6 +176,7 @@ public class TaskResult {
     public int getErrorCount() {
         return errorCaseMap.size();
     }
+
     public int getSkipCount() {
         return skipCaseMap.size();
     }
@@ -188,27 +187,28 @@ public class TaskResult {
 
     /**
      * get class name.
+     *
      * @param name whole name, such as: com.alibaba.nacos.config.ConfigSyncTest.
      * @return class name. such as: ConfigSyncTest.
      */
-    public String getClassName(String name){
+    public String getClassName(String name) {
         String[] classNameArray = name.contains(".") ? name.split("\\.") : name.split("/");
-        return classNameArray[classNameArray.length-1];
+        return classNameArray[classNameArray.length - 1];
     }
 
     /**
      * write case content to markdown
      *
      * @param repoBaseUrl repository base url.
-     * @param builder Markdown builder.
-     * @param caseMap case result map.
+     * @param builder     Markdown builder.
+     * @param caseMap     case result map.
      * @param fileInfoMap repository file map.
-     * @param title section title.
-     * @param level font size level.
-     * @param logo logo.
+     * @param title       section title.
+     * @param level       font size level.
+     * @param logo        logo.
      */
-    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level, String logo){
-        builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", level+1);
+    public void writeContentToMarkdown(String repoBaseUrl, MarkdownBuilder builder, Map<String, CaseResult> caseMap, HashMap<String, RepoFileInfo> fileInfoMap, String title, int level, String logo) {
+        builder.addHeader("🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰🟰", level + 1);
         builder.addHeader(title, level);
 
         MarkdownBuilder builder_tmp = MarkdownBuilder.builder();
@@ -218,13 +218,12 @@ public class TaskResult {
         for (CaseResult caseResult : caseMap.values()) {
             MarkdownLinkBuilder linkBuilder = MarkdownLinkBuilder.builder();
             String caseUrl = repoBaseUrl;
-            if(fileInfoMap.containsKey(getClassName(caseResult.getClassName()))){
+            if (fileInfoMap.containsKey(getClassName(caseResult.getClassName()))) {
                 caseUrl = fileInfoMap.get(getClassName(caseResult.getClassName())).getFileUrl();
             }
-            System.out.println(caseUrl);
             linkBuilder.setLink(caseResult.getClassName() + "." + caseResult.getMethodName(),
                     caseUrl);
-            tableBuilder.addRow(linkBuilder.build(), logo+"pass", caseResult.getTime());
+            tableBuilder.addRow(linkBuilder.build(), logo + "pass", caseResult.getTime());
         }
         builder.addCollapse("🔎  Case Detail ", builder_tmp.addTable(tableBuilder).build());
     }

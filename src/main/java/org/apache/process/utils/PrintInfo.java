@@ -19,32 +19,27 @@
 
 package org.apache.process.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Response;
 
 import java.io.IOException;
 
+@Slf4j
 public class PrintInfo {
 
-    public static void printRocketInfo(Response response, String name) throws IOException {
-        if(response.isSuccessful()){
-            System.out.println(name);
-        }else{
-            System.out.println("Fail! "+ response.body().string());
+    public static boolean printRocketInfo(Response response, String message) throws IOException {
+        if (response.isSuccessful()) {
+            log.info(message);
+            return true;
+        } else {
+            log.error("Response fail! Message: {}", response.body().string());
+            return true;
         }
     }
 
-    public static void printRocketInfoAndExit(Response response, String name){
-        if(response.isSuccessful()){
-            System.out.println(name);
-        }else{
-            System.out.println(response.message());
-            System.exit(1);
-        }
+    public static boolean isResponseSuccess(Response response) {
+        boolean isSuccessed = response.isSuccessful();
         response.close();
-    }
-    public static boolean isResponseSuccess(Response response){
-       boolean isSuccessed = response.isSuccessful();
-       response.close();
-       return isSuccessed;
+        return isSuccessed;
     }
 }

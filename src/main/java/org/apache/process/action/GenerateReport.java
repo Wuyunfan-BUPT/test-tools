@@ -1,5 +1,6 @@
 package org.apache.process.action;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.process.report_utils.testcase.TaskResult;
 import org.apache.process.report_utils.testcase.xUnitTestResultParser;
 import org.apache.process.utils.ConfigUtils;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@Slf4j
 public class GenerateReport {
     /**
      * genarate markdown by test xml report.
@@ -35,7 +37,7 @@ public class GenerateReport {
                 fileList.add(new File(xmlPath + "/" + file));
             }
         } else {
-            System.out.println("xml files unfounded!");
+            log.error("xml files unfounded!");
             return false;
         }
         // parse test files.
@@ -52,10 +54,10 @@ public class GenerateReport {
             String str = res.toMarkdown(envMap.get("REPO_NAME").toString(), repoBaseUrl, envMap.get("BRANCH").toString(), envMap.get("CODE_PATH").toString(), githubToken.replace("\n", ""));
             fw.write(str);
             fw.close();
-            System.out.println("Generate report success!");
+            log.info("Generate report success!");
             return true;
         } catch (IOException e) {
-            System.out.println("Fail to generate report! Error message: " + e.getMessage());
+            log.error("Fail to generate report! Error message: {}", e.getMessage());
             return false;
         }
     }
