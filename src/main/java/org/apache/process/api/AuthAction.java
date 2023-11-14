@@ -19,24 +19,28 @@
 
 package org.apache.process.api;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.process.config.Configs;
 import org.json.JSONObject;
 
 import java.util.Objects;
 
+@Slf4j
 public class AuthAction {
     public static final String APP_API = "auth";
     private final String URL;
     private final OkHttpClient client;
-    public AuthAction(){
+
+    public AuthAction() {
         client = new OkHttpClient();
-        URL = "http://"+ Configs.IP +"/"+ Configs.KUBEVELA_API + "/" + APP_API;
+        URL = "http://" + Configs.IP + "/" + Configs.KUBEVELA_API + "/" + APP_API;
     }
+
     public void setToken(String action) {
 
         Request request = null;
-        if("login".equals(action)) {
+        if ("login".equals(action)) {
             String url = URL + "/" + "login";
             String bodyContent = String.format("{\n \"code\": \"string\",\n \"password\": \"%s\",\n  \"username\": \"%s\"\n}", Configs.VELAUX_PASSWORD, Configs.VELAUX_USERNAME);
             RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyContent);
@@ -46,7 +50,7 @@ public class AuthAction {
                     .addHeader("Content-Type", "application/json")
                     .addHeader("Accept", "application/json, application/xml")
                     .build();
-        }else{
+        } else {
             String url = URL + "/" + "refresh_token";
             request = new Request.Builder()
                     .url(url)
@@ -59,19 +63,19 @@ public class AuthAction {
 
         int retryTimes = 3;
         boolean isSuccess = false;
-        while(retryTimes-- > 0 && !isSuccess){
-            try(Response response = client.newCall(request).execute();){
+        while (retryTimes-- > 0 && !isSuccess) {
+            try (Response response = client.newCall(request).execute()) {
                 JSONObject json = new JSONObject(response.body().string());
-                if(json.has("accessToken") && !Objects.equals(json.getString("accessToken"), "")){
+                if (json.has("accessToken") && !Objects.equals(json.getString("accessToken"), "")) {
                     Configs.TOKEN = json.getString("accessToken");
-                    Configs.Authorization = "Bearer "+Configs.TOKEN;
+                    Configs.Authorization = "Bearer " + Configs.TOKEN;
                     Configs.REFRESH_TOKEN = json.getString("refreshToken");
                     isSuccess = true;
-                }else{
-                    System.out.printf("%s error!%n", action);
+                } else {
+                    log.info("{} fail! ", action);
                 }
-            }catch(Exception e){
-                System.out.printf("%s error! %n", action);
+            } catch (Exception e) {
+                log.error("{} error! ", action);
             }
         }
 

@@ -30,22 +30,21 @@ import java.util.LinkedHashMap;
 public class GetParam {
     public HashMap<String, String> setParam(CommandLine cmd) {
         HashMap<String, String> result = new HashMap<>();
-        for(Option option:cmd.getOptions()){
-            System.out.println(option.getLongOpt()+":"+option.getValue());
+        for (Option option : cmd.getOptions()) {
             result.put(option.getLongOpt(), option.getValue());
         }
         return result;
     }
 
-    public static LinkedHashMap<String, Object> yamlToMap(String input){
+    public static LinkedHashMap<String, Object> yamlToMap(String input) {
         Yaml yaml = new Yaml();
-        return (LinkedHashMap<String,Object>) yaml.load(input);
+        return (LinkedHashMap<String, Object>) yaml.load(input);
     }
 
-    public static HashMap<String, Object> parseDeployInput(String input,String target){
-        LinkedHashMap<String,Object> builderMap = yamlToMap(input);
-        LinkedHashMap<String,Object> helmValuesMap = (LinkedHashMap<String,Object>)builderMap.get(target);
-        JSONObject jsonObject=new JSONObject(helmValuesMap);
+    public static HashMap<String, Object> parseDeployInput(String input, String target) {
+        LinkedHashMap<String, Object> builderMap = yamlToMap(input);
+        LinkedHashMap<String, Object> helmValuesMap = (LinkedHashMap<String, Object>) builderMap.get(target);
+        JSONObject jsonObject = new JSONObject(helmValuesMap);
         builderMap.put(target, jsonObject.toString().replaceAll("\"", "\\\\\"").toString());
         return builderMap;
     }

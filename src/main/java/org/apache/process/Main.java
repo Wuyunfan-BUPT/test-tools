@@ -19,6 +19,7 @@
 
 package org.apache.process;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.process.action.Deploy;
 import org.apache.process.action.PortForward;
 import org.apache.process.action.EnvClean;
@@ -34,6 +35,7 @@ import java.util.*;
 import static org.apache.process.utils.GetParam.parseDeployInput;
 import static org.apache.process.utils.GetParam.yamlToMap;
 
+@Slf4j
 public class Main {
     public static void main(String[] args) {
         /* define input parameters */
@@ -50,7 +52,7 @@ public class Main {
             GetParam getParam = new GetParam();
             paramsMap = getParam.setParam(cmd);
         } catch (ParseException e) {
-            System.out.println(e.getMessage());
+            log.info("Params input error! Message: {}", e.getMessage());
             helper.printHelp("Usage:", options);
             System.exit(1);
         }
@@ -66,35 +68,34 @@ public class Main {
             if (inputMap.getOrDefault("velauxUsername", null) != null && inputMap.getOrDefault("velauxPassword", null) != null) {
                 Configs.VELAUX_USERNAME = inputMap.get("velauxUsername").toString();
                 Configs.VELAUX_PASSWORD = inputMap.get("velauxPassword").toString();
-            }else{
-                String authentificationInfo[] =  configUtils.getAuthInfoFromConfig(askConfig).split(":");
+            } else {
+                String authentificationInfo[] = configUtils.getAuthInfoFromConfig(askConfig).split(":");
                 Configs.VELAUX_USERNAME = authentificationInfo[0];
                 Configs.VELAUX_PASSWORD = authentificationInfo[1];
             }
 
-            String kubeConfigPath = configUtils.setConfig(askConfig);
-            configUtils.setKubeClientConfig(kubeConfigPath);
-            new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD, askConfig);
+            configUtils.setConfig(askConfig);
+            //configUtils.setKubeClientConfig(kubeConfigPath);
+            new PortForward().startPortForward(Configs.VELA_NAMESPACE, Configs.VELA_POD_LABELS, Configs.PORT_FROWARD);
 
             boolean isSuccessed = false;
             if ("deploy".equals(action)) {
                 HashMap<String, Object> deployMap = parseDeployInput(inputYamlString, "helm");
                 isSuccessed = new Deploy().startDeploy(deployMap);
             } else if ("test".equals(action)) {
-                inputMap.put("askConfig", askConfig);
                 isSuccessed = new RepoTest().runTest(inputMap);
                 isSuccessed = new GenerateReport().generateReportMarkDown(inputMap) && isSuccessed;
             } else if ("clean".equals(action)) {
                 isSuccessed = new EnvClean().clean(inputMap);
             } else {
-                System.out.println("Error! Please input action!");
+                log.error("Error! Please input action!");
             }
 
             if (isSuccessed && Configs.IS_ALL_CASE_SUCCESS) {
                 System.exit(0);
             }
         } catch (Exception e) {
-            System.out.println("Execute error! Message: "+e.getMessage());
+            log.error("Execute error! Message: {}", e.getMessage());
         }
         System.exit(1);
     }

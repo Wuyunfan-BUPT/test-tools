@@ -28,23 +28,13 @@ public class EnvActions {
     public static final String APP_API = "envs";
     private final OkHttpClient client;
     public String URL;
-    public EnvActions(){
-        client  = new OkHttpClient();
-        URL = "http://"+ Configs.IP +"/"+ Configs.KUBEVELA_API + "/" + APP_API;
+
+    public EnvActions() {
+        client = new OkHttpClient();
+        URL = "http://" + Configs.IP + "/" + Configs.KUBEVELA_API + "/" + APP_API;
     }
 
-    public Response listEnv() throws IOException {
-        Request request = new Request.Builder()
-                .url(URL)
-                .get()
-                .addHeader("Accept", "application/json, application/xml")
-                .addHeader("Authorization", Configs.Authorization)
-                .build();
-
-        return client.newCall(request).execute();
-    }
-    public Response createEnv(String bodyContent) throws IOException{
-        //OkHttpClient client = new OkHttpClient();
+    public Response createEnv(String bodyContent) throws IOException {
         RequestBody body = RequestBody.create(MediaType.parse("application/json"), bodyContent);
 
         Request request = new Request.Builder()
@@ -59,8 +49,7 @@ public class EnvActions {
     }
 
     public Response deleteEnv(String namespace) throws IOException {
-        String url = URL + "/" +namespace;
-        //OkHttpClient client = new OkHttpClient();
+        String url = URL + "/" + namespace;
 
         Request request = new Request.Builder()
                 .url(url)

@@ -27,34 +27,34 @@ import org.apache.process.config.Configs;
 import org.apache.process.model.Deploymodel;
 import org.apache.process.utils.PrintInfo;
 import org.json.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-
+@Slf4j
 public class Deploy {
-    public boolean startDeploy(HashMap<String, Object> paramsMap) throws InterruptedException {
-        System.out.println("************************************");
-        System.out.println("*     Create namespace and deploy...     *");
-        System.out.println("************************************");
+    public boolean startDeploy(HashMap<String, Object> paramsMap) {
+        log.info("****  Create namespace and deploy...  ****");
 
         AuthAction authAction = new AuthAction();
         authAction.setToken("login");
-        //TimeUnit.SECONDS.sleep(1);
 
         String namespace = paramsMap.get("namespace").toString();
-        System.out.printf("Generate namespace(%s) and namespace(%s)%n", namespace, namespace);
+        log.info("Generate namespace {}", namespace);
 
         EnvActions envActions = new EnvActions();
         String envBodyContent = String.format(Deploymodel.ENV_BODY, namespace, namespace, Configs.PROJECT_NAME, namespace);
         try (Response response = envActions.createEnv(envBodyContent);) {
             PrintInfo.printRocketInfo(response, String.format("Generate namespace(%s) success!", namespace));
         } catch (Exception e) {
-            System.out.printf("Error! %s \n", e);
+            log.error("Create env Error! Message: {}", e.getMessage());
             return false;
         }
 
-        System.out.printf("Generate %s Application%n", namespace);
+        log.info("Generate {} Application", namespace);
         AppActions appActions = new AppActions();
 
         authAction.setToken("refresh_token");
@@ -63,28 +63,30 @@ public class Deploy {
         try (Response createAppResponse = appActions.createApplication(bodyContent)) {
             PrintInfo.printRocketInfo(createAppResponse, String.format(String.format("Generate %s Application success!", namespace)));
         } catch (Exception e) {
-            System.out.printf("Error! %s \n", e);
+            log.error("Create application Error! Message: {}", e.getMessage());
             return false;
         }
 
-        System.out.printf("deploy %s Application%n", namespace);
+        log.info("deploy {} Application", namespace);
 
         String workflowName = "workflow-" + namespace;
         String deployBodyContent = String.format(Deploymodel.DEPLOY_APP_BODY, workflowName);
         authAction.setToken("refresh_token");
         try (Response response = appActions.deployOrUpgradeApplication(namespace, deployBodyContent);) {
-            PrintInfo.printRocketInfoAndExit(response, String.format("deploy %s Application success!", namespace));
+            if (!PrintInfo.printRocketInfo(response, String.format("Deploy %s Application success!", namespace))) {
+                return false;
+            }
         } catch (Exception e) {
-            System.out.printf("Error! %s \n", e);
+            log.error("Deploy application Error! Message: {}", e.getMessage());
             return false;
         }
 
-        System.out.printf("Query %s Application status%n", namespace);
-
-        int querryTime = Integer.parseInt(paramsMap.get("waitTimes").toString()) / 5;
+        log.info("Query pod {} Application status", namespace);
+        int waitTimes = Integer.parseInt(paramsMap.get("waitTimes").toString());
+        LocalDateTime startTime = LocalDateTime.now();
         Response response = null;
         try {
-            while (querryTime > 0) {
+            while (ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) <= waitTimes) {
                 authAction.setToken("refresh_token");
                 response = appActions.getApplicationStatus(namespace, namespace);
                 JSONObject json;
@@ -100,14 +102,13 @@ public class Deploy {
                 String message = new JSONObject(json.getJSONObject("status").getJSONArray("services").get(0).toString()).getString("message");
 
                 if ("succeeded".equals(workflowsStatus)) {
-                    System.out.println("Success! Message: " + message);
+                    log.info("Success! Message: " + message);
                     break;
                 } else if ("executing".equals(workflowsStatus)) {
-                    System.out.println("Waiting... Message : " + message);
-                    querryTime--;
+                    log.info("Waiting... Message : " + message);
                     TimeUnit.SECONDS.sleep(5);
                 } else {
-                    System.out.println("Error! Message: " + message);
+                    log.error("Error! Message: {}", message);
                     return false;
                 }
             }
@@ -115,7 +116,12 @@ public class Deploy {
             if (response != null) {
                 response.close();
             }
-            System.out.println("Error! " + e.getMessage());
+            log.error("Error! Message: {}", e.getMessage());
+            return false;
+        }
+
+        if(ChronoUnit.SECONDS.between(startTime, LocalDateTime.now()) > waitTimes){
+            log.error("Error! Deploy timeout !");
             return false;
         }
         return true;

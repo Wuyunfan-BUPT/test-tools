@@ -25,30 +25,6 @@ import org.yaml.snakeyaml.Yaml;
 import java.util.Map;
 
 public class Deploymodel {
-    public static final String COMPONENT_PROPERTY= "{\\\"chart\\\": \\\"%s\\\",\\\"git\\\": {\\\"branch\\\": \\\"%s\\\"},\\\"repoType\\\": \\\"git\\\",\\\"retries\\\": 3,\\\"url\\\": \\\"%s\\\",\\\"values\\\": {\\\"nameserver\\\": {\\\"image\\\": {\\\"repository\\\": \\\"wuyfeedocker/rocketm-ci\\\",\\\"tag\\\": \\\"Wuyunfan-BUPT-patch-13-1bcdbc6f-810c-483f-8cc8-ec7767d62ad5-ubuntu\\\"}},\\\"broker\\\": {\\\"image\\\": {\\\"repository\\\": \\\"wuyfeedocker/rocketm-ci\\\",\\\"tag\\\": \\\"Wuyunfan-BUPT-patch-13-1bcdbc6f-810c-483f-8cc8-ec7767d62ad5-ubuntu\\\"}},\\\"proxy\\\": {\\\"image\\\": {\\\"repository\\\": \\\"wuyfeedocker/rocketm-ci\\\",\\\"tag\\\": \\\"Wuyunfan-BUPT-patch-13-1bcdbc6f-810c-483f-8cc8-ec7767d62ad5-ubuntu\\\"}}}}";
-    public static final String COMPONENT_PROPERTY1= "{\\\"chart\\\": \\\"%s\\\",\\\"git\\\": {\\\"branch\\\": \\\"%s\\\"},\\\"repoType\\\": \\\"git\\\",\\\"retries\\\": 3,\\\"url\\\": \\\"%s\\\",\\\"values\\\": {\\\"nameserver\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\\\"}},\\\"broker\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\\\"}},\\\"proxy\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\\\"}}}}";
-
-    public static final String COMPONENT_PROPERTY_FAIL= "{\\\"chart\\\": \\\"%s\\\",\\\"git\\\": {\\\"branch\\\": \\\"%s\\\"},\\\"repoType\\\": \\\"git\\\",\\\"retries\\\": 3,\\\"url\\\": \\\"%s\\\",\\\"values\\\": {\\\"nameserver\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\\\"}},\\\"broker\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu1\\\"}},\\\"proxy\\\": {\\\"image\\\": {\\\"repository\\\": \\\"apache/rocketmq-ci\\\",\\\"tag\\\": \\\"develop-7be7f477-ddcb-45d0-910b-92a213f7a37c-ubuntu\\\"}}}}";
-
-    public static final String COMPONENT_BODY = "{\n" +
-            "  \"componentType\": \"helm\",\n" +
-            "  \"description\": \"test-rocketmq-test-tools-TEST_ROCKETMQ_TEST_TOOL-4900881027@Wuyunfan-BUPT-patch-13-1bcdbc6f-810c-483f-8cc8-ec7767d62ad5-ubuntu\",\n" +
-            "  \"name\": \"%s\",\n" +
-            "  \"properties\": \"%s\" \n" +
-            "}";
-    public static final String APPLICATION_BODY = "{\n" +
-            "    \"name\": \"%s\",\n" +
-            "    \"project\": \"%s\",\n" +
-            "    \"description\": \"%s\",\n" +
-            "    \"alias\": \"%s\",\n" +
-            "    \"envBinding\": [\n" +
-            "        {\n" +
-            "            \"name\": \"%s\"\n" +
-            "        }\n" +
-            "    ]\n" +
-            "}";
-
-
     public static final String APPLICATION_BODY_COMPONENT = "{\n" +
             "    \"name\": \"%s\",\n" +
             "    \"project\": \"%s\",\n" +
@@ -67,7 +43,6 @@ public class Deploymodel {
             "}";
 
 
-
     public static final String ENV_BODY = "{\n" +
             "  \"allowTargetConflict\": true,\n" +
             "  \"description\": \"create env for test\",\n" +
@@ -84,25 +59,25 @@ public class Deploymodel {
             "  \"workflowName\": \"%s\"\n" +
             "}";
 
-    public static String generateComponentProperties(String helmValue, String chartPath, String chartBranch, String chartGit){
+    public static String generateComponentProperties(String helmValue, String chartPath, String chartBranch, String chartGit) {
         StringBuilder builder = new StringBuilder();
         String baseString =
-                "chart: %s\n"+
-                "git:\n"+
-                "  branch: %s\n"+
-                "repoType: git\n"+
-                "retries: 3\n"+
-                "url: %s\n"+
-                "values:\n";
+                "chart: %s\n" +
+                        "git:\n" +
+                        "  branch: %s\n" +
+                        "repoType: git\n" +
+                        "retries: 3\n" +
+                        "url: %s\n" +
+                        "values:\n";
         builder.append(String.format(baseString, chartPath, chartBranch, chartGit));
         String[] lines = helmValue.split("\n");
-        for(String line:lines){
+        for (String line : lines) {
             builder.append("  ").append(line).append("\n");
         }
         Yaml yaml = new Yaml();
 
-        Map<String,Object> map= (Map<String, Object>) yaml.load(builder.toString());
-        JSONObject jsonObject=new JSONObject(map);
+        Map<String, Object> map = (Map<String, Object>) yaml.load(builder.toString());
+        JSONObject jsonObject = new JSONObject(map);
         return jsonObject.toString().replaceAll("\"", "\\\\\"");
     }
 

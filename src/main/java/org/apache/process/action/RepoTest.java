@@ -19,89 +19,91 @@
 
 package org.apache.process.action;
 
-import io.kubernetes.client.custom.Quantity;
-import io.kubernetes.client.openapi.ApiException;
-import io.kubernetes.client.openapi.apis.CoreV1Api;
-import io.kubernetes.client.openapi.models.*;
+
+import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.client.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
 
+@Slf4j
 public class RepoTest {
 
-    public boolean runTest(LinkedHashMap<String, Object> inputMap) throws ApiException, IOException, InterruptedException, ExecutionException, TimeoutException {
-        System.out.println("**************E2E TEST...***************");
-        CoreV1Api api = new CoreV1Api();
-
+    public boolean runTest(LinkedHashMap<String, Object> inputMap) throws IOException, InterruptedException {
         String namespace = inputMap.get("namespace").toString();
-        String testPodName = "test-" + namespace + "-"+ new Random().nextInt(100000);
-        System.out.printf("** namespace: %s **%n", namespace);
-        // create a pod
-        V1Pod pod_template = new V1Pod();
-        pod_template.setApiVersion(inputMap.get("API_VERSION").toString());
-        pod_template.setKind(inputMap.get("KIND").toString());
-        // set pod: metadata
-        pod_template.setMetadata(new V1ObjectMeta().name(testPodName).namespace(namespace));//
-        // set pod: spec
-        V1PodSpec pod_template_spec = new V1PodSpec();
-        pod_template_spec.setRestartPolicy(inputMap.get("RESTART_POLICY").toString());
-        // set pod spec: container
-        V1Container container = new V1Container();
-        System.out.println("*******************" + testPodName + "*******************");
+        String testPodName = "test-" + namespace + "-" + new Random().nextInt(100000);
+        log.info("****    E2E TEST...    ****");
+        log.info("namespace: {}, test pod name: {}", namespace, testPodName);
 
-
-        // ***********set container***********
-        // set pod spec container: name and images
-        LinkedHashMap<String, Object>  containerMap = (LinkedHashMap)inputMap.get("CONTAINER");
-        container.setName(testPodName);
-        container.setImage(containerMap.get("IMAGE").toString());
-        // set pod spec container: resource
-        LinkedHashMap<String, Object>  limitsResourceMap = (LinkedHashMap)containerMap.get("RESOURCE_LIMITS");
+        LinkedHashMap<String, Object> containerMap = (LinkedHashMap) inputMap.get("CONTAINER");
+        // build resource limits
+        LinkedHashMap<String, Object> limitsResourceMap = (LinkedHashMap) containerMap.get("RESOURCE_LIMITS");
         HashMap<String, Quantity> resourcesLimits = new HashMap<>();
-        for(String limitKey: limitsResourceMap.keySet()){
+        for (String limitKey : limitsResourceMap.keySet()) {
             resourcesLimits.put(limitKey, new Quantity(limitsResourceMap.get(limitKey).toString()));
         }
-        LinkedHashMap<String, Object>  requestResourceMap = (LinkedHashMap)containerMap.get("RESOURCE_REQUIRE");
+        // build resource requests
+        LinkedHashMap<String, Object> requestResourceMap = (LinkedHashMap) containerMap.get("RESOURCE_REQUIRE");
         HashMap<String, Quantity> resourceRequests = new HashMap<>();
-        for(String requestKey: requestResourceMap.keySet()){
-            resourcesLimits.put(requestKey, new Quantity(requestResourceMap.get(requestKey).toString()));
+        for (String requestKey : requestResourceMap.keySet()) {
+            resourceRequests.put(requestKey, new Quantity(requestResourceMap.get(requestKey).toString()));
         }
-        V1ResourceRequirements v1ResourceRequirements = new V1ResourceRequirements();
-        v1ResourceRequirements.setLimits(resourcesLimits);
-        v1ResourceRequirements.setRequests(resourceRequests);
-        container.setResources(v1ResourceRequirements);
-
-        // set V container: env elements
-        LinkedHashMap<String, Object> envMap = (LinkedHashMap)inputMap.get("ENV");
-        if(envMap.get("ALL_IP")==null || "null".equals(envMap.get("ALL_IP"))){
+        // biild env
+        LinkedHashMap<String, Object> envMap = (LinkedHashMap) inputMap.get("ENV");
+        if (envMap.get("ALL_IP") == null || "null".equals(envMap.get("ALL_IP"))) {
             /* get all IP */
-            V1PodList pods = api.listNamespacedPod(namespace, null, null, null, null, null, null, null, null, null, null);
-            StringBuilder allIP = new StringBuilder();
-            for (V1Pod pod : pods.getItems()) {
-                allIP.append(pod.getMetadata().getName()).append(":").append(pod.getStatus().getPodIP()).append(",");
+            try (KubernetesClient client = new DefaultKubernetesClient()) {
+                List<Pod> pods = client.pods().inNamespace(namespace).list().getItems();
+                StringBuilder allIP = new StringBuilder();
+                for (Pod pod : pods) {
+                    allIP.append(pod.getMetadata().getName()).append(":").append(pod.getStatus().getPodIP()).append(",");
+                }
+                envMap.put("ALL_IP", allIP.substring(0, allIP.length() - 1));
             }
-            envMap.put("ALL_IP", allIP.substring(0, allIP.length()-1));
+        }
+        // set env elements
+        EnvVar[] envVars = new EnvVar[envMap.size()];
+        int envItemIndex = 0;
+        for (String envKey : envMap.keySet()) {
+            envVars[envItemIndex] = new EnvVar(envKey, envMap.get(envKey).toString(), null);
+            envItemIndex++;
         }
 
-        for(String envKey: envMap.keySet()){
-            V1EnvVar v1EnvVar = new V1EnvVar();
-            v1EnvVar.setName(envKey);
-            v1EnvVar.setValue(envMap.get(envKey).toString());
-            container.addEnvItem(v1EnvVar);
+        try (final KubernetesClient client = new KubernetesClientBuilder().build()) {
+            Pod pod = new PodBuilder()
+                    .withApiVersion(inputMap.get("API_VERSION").toString())
+                    .withKind(inputMap.get("KIND").toString())
+                    .withNewMetadata()
+                    .withName(testPodName)
+                    .withNamespace(namespace)
+                    .endMetadata()
+                    .withNewSpec()
+                    .withRestartPolicy(inputMap.get("RESTART_POLICY").toString())
+                    .withContainers(new ContainerBuilder()
+                            .withName(testPodName)
+                            .withImage(containerMap.get("IMAGE").toString())
+                            .withResources(new ResourceRequirementsBuilder()
+                                    .withRequests(resourceRequests)
+                                    .withLimits(resourcesLimits)
+                                    .build()
+                            )
+                            .withEnv(envVars)
+                            .build())
+                    .endSpec()
+                    .build();
+
+            for (int retryTimes = 3; retryTimes > 0; retryTimes--) {
+                try {
+                    // 使用KubernetesClient创建Pod
+                    client.pods().inNamespace(namespace).resource(pod).create();
+                    break;
+                } catch (Exception e) {
+                    log.error("create pod {} failed, retry again...", testPodName);
+                }
+            }
+
+            return new QueryTestPod().getPodResult(testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
         }
-
-        // add container to spec
-        pod_template_spec.addContainersItem(container);
-
-        // add spec to pod
-        pod_template.setSpec(pod_template_spec);
-
-        // create pod
-        api.createNamespacedPod(namespace, pod_template, null, null, null, null);
-        return new QueryTestPod().getPodResult(inputMap.get("askConfig").toString(), testPodName, namespace, envMap.get("CODE_PATH").toString(), Integer.parseInt(envMap.get("WAIT_TIME").toString()));
     }
 }
